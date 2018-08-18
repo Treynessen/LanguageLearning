@@ -4,7 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 
 [Serializable]
-public class Serialize
+public sealed class Serialize
 {
     public WordsAndTexts WordsAndText_DATA { get; private set; }
 
