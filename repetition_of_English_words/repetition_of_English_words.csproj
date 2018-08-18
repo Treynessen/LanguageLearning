@@ -45,7 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WordsAndTexts.cs" />
+    <Compile Include="Serialize\Serialize.cs" />
+    <Compile Include="WordsAndTexts\WordsAndTexts AddWordTranslation.cs" />
+    <Compile Include="WordsAndTexts\WordsAndTexts AddTextTranslation.cs" />
+    <Compile Include="WordsAndTexts\WordsAndTexts AddTexts.cs" />
+    <Compile Include="WordsAndTexts\WordsAndTexts AddWords.cs" />
+    <Compile Include="WordsAndTexts\WordsAndTexts.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

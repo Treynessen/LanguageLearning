@@ -26,7 +26,8 @@ namespace repetition_of_English_words
                 StartButton.Enabled = false;
                 return;
             }
-            data = WordsAndTexts.DesirializeFromFile(data_file);
+            Serialize serialize = Serialize.DesirializeFromFile(data_file);
+            data = serialize.WordsAndText_DATA;
         }
 
         private void StartButton_Click(object sender, EventArgs e)
@@ -46,7 +47,7 @@ namespace repetition_of_English_words
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (data != null && data_file != null) WordsAndTexts.SerializeToFile(data_file, data);
+            if (data != null && data_file != null) Serialize.SerializeToFile(data_file, new Serialize(data));
             if (data_file != null) data_file.Close();
         }
     }
