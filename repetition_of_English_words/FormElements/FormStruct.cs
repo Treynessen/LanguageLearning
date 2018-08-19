@@ -14,7 +14,7 @@ public abstract class FormStruct
         text_font = new Font("Consolas", 16, FontStyle.Regular);
         BackButton = new Button();
         BackButton.Text = "Назад";
-        BackButton.Visible = true;
+        BackButton.Visible = false;
         BackButton.Width = 150;
         BackButton.Height = 50;
         BackButton.Location = new Point(725, 511);

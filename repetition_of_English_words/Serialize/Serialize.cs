@@ -8,9 +8,9 @@ using System.Collections.Generic;
 public sealed class Serialize
 {
     public WordsAndTexts WordsAndText_DATA { get; private set; }
-    public LinkedList<string> Incomprehensible { get; private set; }
+    public LinkedList<KeyValuePair<string, WordsAndTexts.Type>> Incomprehensible { get; private set; }
 
-    public Serialize(WordsAndTexts data, LinkedList<string> incomprehensible)
+    public Serialize(WordsAndTexts data, LinkedList<KeyValuePair<string, WordsAndTexts.Type>> incomprehensible)
     {
         WordsAndText_DATA = data;
         Incomprehensible = incomprehensible;

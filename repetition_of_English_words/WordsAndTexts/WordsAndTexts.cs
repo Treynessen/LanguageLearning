@@ -12,10 +12,10 @@ public partial class WordsAndTexts
     {
         Words = new LinkedList<KeyValuePair<string, StringList>>[500];
         Texts = new LinkedList<KeyValuePair<string, StringList>>[100];
-        
+
     }
 
-    int GetIndex(string str, int arr_length)
+    public int GetIndex(string str, int arr_length)
     {
         int index = 0;
         for (int i = 0; i < str.Length; ++i) index += str[i];
@@ -24,12 +24,12 @@ public partial class WordsAndTexts
 
     StringList CheckKeysInWords(int index, string word)
     {
-        if(Words[index]==null)
+        if (Words[index] == null)
         {
             Words[index] = new LinkedList<KeyValuePair<string, StringList>>();
             return null;
         }
-        foreach(var k in Words[index])
+        foreach (var k in Words[index])
         {
             if (k.Key == word) return k.Value;
         }
@@ -57,4 +57,11 @@ public partial class WordsAndTexts
     // Метод public void AddWordTranslation
 
     // Метод public void AddTextTranslation
+
+    public enum Type
+    {
+        Word,
+        Text,
+        None
+    }
 }

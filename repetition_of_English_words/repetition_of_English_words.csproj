@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FormElements\AddWordOrTextElements.cs" />
+    <Compile Include="FormElements\StartForm.cs" />
     <Compile Include="FormElements\FormStruct.cs" />
     <Compile Include="Serialize\Serialize.cs" />
     <Compile Include="WordsAndTexts\WordsAndTexts AddWordTranslation.cs" />
