@@ -21,6 +21,24 @@ public partial class WordsAndTexts
         return index = index % arr_length;
     }
 
+    StringList CheckKeysInWords(int index, string word)
+    {
+        foreach(var k in Words[index])
+        {
+            if (k.Key == word) return k.Value;
+        }
+        return null;
+    }
+
+    StringList CheckKeysInTexts(int index, string text)
+    {
+        foreach (var k in Texts[index])
+        {
+            if (k.Key == text) return k.Value;
+        }
+        return null;
+    }
+
     // Метод public void AddWord
 
     // Метод public void AddText

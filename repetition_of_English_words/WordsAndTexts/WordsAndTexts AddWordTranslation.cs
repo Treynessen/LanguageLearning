@@ -1,4 +1,6 @@
-﻿public partial class WordsAndTexts
+﻿//переписать
+
+public partial class WordsAndTexts
 {
     public void AddWordTranslation(string word, string translation)
     {
@@ -42,7 +44,7 @@
         }
     }
 
-    public void AddWordTranslation(string word, params string[] translation)
+    public void AddWordTranslation(string word, string[] translation)
     {
         int index = GetIndex(word, Words.Length);
         foreach (var s in Words[index])

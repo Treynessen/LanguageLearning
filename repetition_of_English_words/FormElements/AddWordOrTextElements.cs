@@ -14,22 +14,22 @@ public sealed class FormAddWordsOrText : FormStruct
     private Panel TranslationPanel;
     private Button AddWord;
 
-    public string WordOrText
+    public override string WordOrText
     {
-        get { return WordOrTextTextBox.Text; }
+        get { return WordOrTextTextBox.Text.ToLower(); }
     }
-    public string[] Translations
+    public override string[] Translations
     {
         get
         {
             string[] translations = new string[TranslationTextBoxs.Count];
             int it = 0;
-            foreach (var tb in TranslationTextBoxs) translations[it++] = tb.Text;
+            foreach (var tb in TranslationTextBoxs) translations[it++] = tb.Text.ToLower();
             return translations;
         }
     }
 
-    public FormAddWordsOrText(Form1 form, Button activate_button, Form f) : base(form, activate_button)
+    public FormAddWordsOrText(Form1 form, Button activate_button, EventHandler back_main_form, Form f) : base(form, activate_button, back_main_form)
     {
         activate_button.Click += SetVisible;
 
@@ -127,5 +127,5 @@ public sealed class FormAddWordsOrText : FormStruct
         AddWord.Visible = true;
     }
 
-    public void AddWordOrTextClickEvent(EventHandler e) => AddWord.Click += e;
+    public override void FormButton(EventHandler e) => AddWord.Click += e;
 }

@@ -2,15 +2,18 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 [Serializable]
 public sealed class Serialize
 {
     public WordsAndTexts WordsAndText_DATA { get; private set; }
+    public LinkedList<string> Incomprehensible { get; private set; }
 
-    public Serialize(WordsAndTexts data)
+    public Serialize(WordsAndTexts data, LinkedList<string> incomprehensible)
     {
         WordsAndText_DATA = data;
+        Incomprehensible = incomprehensible;
     }
 
     public static void SerializeToFile(Stream file_stream, Serialize data)

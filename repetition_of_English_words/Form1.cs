@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.IO;
+using System.Collections.Generic;
 
 namespace repetition_of_English_words
 {
@@ -8,8 +9,9 @@ namespace repetition_of_English_words
     {
         FileStream data_file = null;
         WordsAndTexts data;
+        LinkedList<string> incomprehensible;
         FormStruct add_word_form, add_text_form;
-        
+
         public Form1()
         {
             InitializeComponent();
@@ -17,8 +19,10 @@ namespace repetition_of_English_words
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            add_word_form = new FormAddWordsOrText(this, AddWordsButton, FormStruct.Form.AddWordForm);
-            add_text_form = new FormAddWordsOrText(this, AddTextsButton, FormStruct.Form.AddTextForm);
+            add_word_form = new FormAddWordsOrText(this, AddWordsButton, BackToMainForm, FormStruct.Form.AddWordForm);
+            add_text_form = new FormAddWordsOrText(this, AddTextsButton, BackToMainForm, FormStruct.Form.AddTextForm);
+            add_word_form.FormButton((_sender, _e) => data.AddWord(add_word_form.WordOrText, add_word_form.Translations));
+            add_text_form.FormButton((_sender, _e) => data.AddText(add_text_form.WordOrText, add_text_form.Translations));
             try
             {
                 data_file = new FileStream("words.data", FileMode.Open);
@@ -31,6 +35,7 @@ namespace repetition_of_English_words
             }
             Serialize serialize = Serialize.DesirializeFromFile(data_file);
             data = serialize.WordsAndText_DATA;
+            incomprehensible = serialize.Incomprehensible;
         }
 
         private void StartButton_Click(object sender, EventArgs e)
@@ -45,7 +50,7 @@ namespace repetition_of_English_words
             AddTextsButton.Visible = false;
             //if (data_file == null) data_file = new FileStream("words.data", FileMode.Create);
             //if (data == null) data = new WordsAndTexts();
-            
+            //if (incomprehensible == null) incomprehensible = new LinkedList<string>();
         }
 
         private void AddTextsButton_Click(object sender, EventArgs e)
@@ -53,15 +58,18 @@ namespace repetition_of_English_words
             StartButton.Visible = false;
             AddWordsButton.Visible = false;
             AddTextsButton.Visible = false;
+            //if (data_file == null) data_file = new FileStream("words.data", FileMode.Create);
+            //if (data == null) data = new WordsAndTexts();
+            //if (incomprehensible == null) incomprehensible = new LinkedList<string>();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (data != null && data_file != null) Serialize.SerializeToFile(data_file, new Serialize(data));
+            if (data != null && data_file != null) Serialize.SerializeToFile(data_file, new Serialize(data, incomprehensible));
             if (data_file != null) data_file.Close();
         }
 
-        public void BackToMainForm(object sender, EventArgs e)
+        private void BackToMainForm(object sender, EventArgs e)
         {
             StartButton.Visible = true;
             AddWordsButton.Visible = true;

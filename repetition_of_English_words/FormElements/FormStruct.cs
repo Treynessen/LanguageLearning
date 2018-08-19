@@ -8,7 +8,7 @@ public abstract class FormStruct
     protected Button BackButton;
     protected Font button_font;
     protected Font text_font;
-    protected FormStruct(Form1 form, Button activate_button)
+    protected FormStruct(Form1 form, Button activate_button, EventHandler back_main_form)
     {
         button_font = new Font("Consolas", 18, FontStyle.Regular);
         text_font = new Font("Consolas", 16, FontStyle.Regular);
@@ -19,7 +19,7 @@ public abstract class FormStruct
         BackButton.Height = 50;
         BackButton.Location = new Point(725, 511);
         BackButton.Font = button_font;
-        BackButton.Click += form.BackToMainForm;
+        BackButton.Click += back_main_form;
         BackButton.Click += BackToMainForm;
         activate_button.Click += SetVisible;
         form.Controls.Add(BackButton);
@@ -39,4 +39,8 @@ public abstract class FormStruct
         AddTextForm,
         AddWordForm
     }
+
+    public abstract void FormButton(EventHandler e);
+    public abstract string WordOrText { get; }
+    public abstract string[] Translations { get; }
 }
