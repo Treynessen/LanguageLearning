@@ -11,7 +11,7 @@ namespace repetition_of_English_words
         FileStream data_file = null;
         WordsAndTexts data;
         LinkedList<Pair> incomprehensible;
-        LinkedList<Pair> words_and_texts_was;
+        LinkedList<Pair> words_and_texts_was; //
         int[] words_filled_cells;
         int[] texts_filled_cells;
         FormAddWordsOrText add_word_form, add_text_form;
@@ -165,7 +165,7 @@ namespace repetition_of_English_words
                 StartButton.Enabled = false;
                 return;
             }
-            data = serialize.WordsAndText_DATA;
+            data = new WordsAndTexts(serialize.Words, serialize.Texts);
             incomprehensible = serialize.Incomprehensible;
             GetFilledCells();
         }
@@ -204,7 +204,7 @@ namespace repetition_of_English_words
             if (data != null && incomprehensible != null)
             {
                 using (data_file = new FileStream("words.data", FileMode.Truncate))
-                    Serialize.SerializeToFile(data_file, new Serialize(data, incomprehensible));
+                    Serialize.SerializeToFile(data_file, new Serialize(data.Words, data.Texts, incomprehensible));
             }
 
         }

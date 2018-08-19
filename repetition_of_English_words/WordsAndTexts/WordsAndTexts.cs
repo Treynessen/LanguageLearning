@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using StringList = System.Collections.Generic.LinkedList<string>;
 
-[Serializable]
 public partial class WordsAndTexts
 {
     public LinkedList<KeyValuePair<string, StringList>>[] Words { get; protected set; } // Ключ - английское слово, значение - связный список с русским переводом
@@ -13,6 +11,12 @@ public partial class WordsAndTexts
         Words = new LinkedList<KeyValuePair<string, StringList>>[500];
         Texts = new LinkedList<KeyValuePair<string, StringList>>[100];
 
+    }
+
+    public WordsAndTexts(LinkedList<KeyValuePair<string, StringList>>[] words, LinkedList<KeyValuePair<string, StringList>>[] texts)
+    {
+        Words = words;
+        Texts = texts;
     }
 
     public int GetIndex(string str, int arr_length)
