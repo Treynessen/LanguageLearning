@@ -39,8 +39,4 @@ public abstract class FormStruct
         AddTextForm,
         AddWordForm
     }
-
-    public abstract void FormButton(EventHandler e);
-    public abstract string WordOrText { get; }
-    public abstract string[] Translations { get; }
 }

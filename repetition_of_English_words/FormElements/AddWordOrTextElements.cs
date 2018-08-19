@@ -9,27 +9,33 @@ public sealed class FormAddWordsOrText : FormStruct
     private Label WordOrTextLabel;
     private TextBox WordOrTextTextBox;
     private Label TranslationLabel;
-    private LinkedList<TextBox> TranslationTextBoxs;
+    private List<TextBox> TranslationTextBoxs;
     private Button AddTranslation;
     private Panel TranslationPanel;
-    private Button AddWord;
+    private Button AddWordButton;
+    private Button ClearButton;
 
-    public override string WordOrText
-    {
-        get { return WordOrTextTextBox.Text.ToLower(); }
-    }
-    public override string[] Translations
+    public string[] Translations
     {
         get
         {
-            string[] translations = new string[TranslationTextBoxs.Count];
-            int it = 0;
-            foreach (var tb in TranslationTextBoxs) translations[it++] = tb.Text.ToLower();
-            return translations;
+            int count = 0;
+            for(int i=0;i< TranslationTextBoxs.Count; ++i)
+            {
+                if (TranslationTextBoxs[i].Text != "") ++count;
+            }
+            string[] strs = new string[count];
+            for(int i = 0, j=0;i< TranslationTextBoxs.Count; ++i)
+            {
+                if (TranslationTextBoxs[i].Text != "") strs[j++] = TranslationTextBoxs[i].Text.ToLower();
+            }
+            return strs;
         }
     }
+    public string WordOrText { get { return WordOrTextTextBox.Text.ToLower(); } }
 
-    public FormAddWordsOrText(Form1 form, Button activate_button, EventHandler back_main_form, Form f) : base(form, activate_button, back_main_form)
+    public FormAddWordsOrText(Form1 form, Button activate_button, EventHandler back_main_form, Form f)
+        : base(form, activate_button, back_main_form)
     {
         activate_button.Click += SetVisible;
 
@@ -64,12 +70,12 @@ public sealed class FormAddWordsOrText : FormStruct
         TranslationLabel.Location = new Point(161, 0);
         TranslationPanel.Controls.Add(TranslationLabel);
 
-        TranslationTextBoxs = new LinkedList<TextBox>();
-        TranslationTextBoxs.AddLast(new TextBox());
-        TranslationTextBoxs.Last.Value.Font = text_font;
-        TranslationTextBoxs.Last.Value.Width = 550;
-        TranslationTextBoxs.Last.Value.Location = new Point(167, 30);
-        TranslationPanel.Controls.Add(TranslationTextBoxs.Last.Value);
+        TranslationTextBoxs = new List<TextBox>();
+        TranslationTextBoxs.Add(new TextBox());
+        TranslationTextBoxs[0].Font = text_font;
+        TranslationTextBoxs[0].Width = 550;
+        TranslationTextBoxs[0].Location = new Point(167, 30);
+        TranslationPanel.Controls.Add(TranslationTextBoxs[0]);
 
         AddTranslation = new Button();
         AddTranslation.Font = text_font;
@@ -79,26 +85,49 @@ public sealed class FormAddWordsOrText : FormStruct
         AddTranslation.Location = new Point(726, 29);
         AddTranslation.Click += (sender, e) =>
         {
-            int text_box_y_pos = TranslationTextBoxs.Last.Value.Location.Y;
-            TranslationTextBoxs.AddLast(new TextBox());
-            TranslationTextBoxs.Last.Value.Font = text_font;
-            TranslationTextBoxs.Last.Value.Width = 550;
-            TranslationTextBoxs.Last.Value.Location = new Point(167, text_box_y_pos + 42);
-            TranslationPanel.Controls.Add(TranslationTextBoxs.Last.Value);
+            int text_box_y_pos = TranslationTextBoxs[TranslationTextBoxs.Count - 1].Location.Y;
+            TranslationTextBoxs.Add(new TextBox());
+            TranslationTextBoxs[TranslationTextBoxs.Count - 1].Font = text_font;
+            TranslationTextBoxs[TranslationTextBoxs.Count - 1].Width = 550;
+            TranslationTextBoxs[TranslationTextBoxs.Count - 1].Location = new Point(167, text_box_y_pos + 42);
+            TranslationPanel.Controls.Add(TranslationTextBoxs[TranslationTextBoxs.Count - 1]);
         };
         TranslationPanel.Controls.Add(AddTranslation);
 
         //////////////////////////////////////////////////////
 
-        AddWord = new Button();
-        AddWord.Font = button_font;
-        AddWord.Width = 220;
-        AddWord.Height = 50;
-        AddWord.Location = new Point(485, 511);
-        if (f == Form.AddWordForm) AddWord.Text = "Добавить слово";
-        else if (f == Form.AddTextForm) AddWord.Text = "Добавить текст";
-        AddWord.Visible = false;
-        form.Controls.Add(AddWord);
+        AddWordButton = new Button();
+        AddWordButton.Font = button_font;
+        AddWordButton.Width = 220;
+        AddWordButton.Height = 50;
+        AddWordButton.Location = new Point(497, 511);
+        if (f == Form.AddWordForm) AddWordButton.Text = "Добавить слово";
+        else if (f == Form.AddTextForm) AddWordButton.Text = "Добавить текст";
+        AddWordButton.Visible = false;
+        form.Controls.Add(AddWordButton);
+
+        ClearButton = new Button();
+        ClearButton.Font = button_font;
+        ClearButton.Width = 180;
+        ClearButton.Height = 50;
+        ClearButton.Location = new Point(309, 511);
+        ClearButton.Text = "Очистить";
+        ClearButton.Visible = false;
+        ClearButton.Click += (sender, e) =>
+        {
+            if (TranslationTextBoxs.Count > 1)
+            {
+                for (int i = 1; i < TranslationTextBoxs.Count; ++i)
+                {
+                    TranslationPanel.Controls.Remove(TranslationTextBoxs[i]);
+                }
+                TranslationTextBoxs.RemoveRange(1, TranslationTextBoxs.Count - 1);
+            }
+            WordOrTextTextBox.Text = "";
+            TranslationTextBoxs[0].Text = "";
+
+        };
+        form.Controls.Add(ClearButton);
 
         BackButton.Visible = false;
         BackButton.Click += BackToMainForm;
@@ -110,13 +139,14 @@ public sealed class FormAddWordsOrText : FormStruct
         WordOrTextTextBox.Visible = false;
         WordOrTextTextBox.Text = "";
         TranslationPanel.Visible = false;
-        while (TranslationTextBoxs.Count > 1)
+        for (int i = 1; i < TranslationTextBoxs.Count; ++i)
         {
-            TranslationPanel.Controls.Remove(TranslationTextBoxs.Last.Value);
-            TranslationTextBoxs.Remove(TranslationTextBoxs.Last);
+            TranslationPanel.Controls.Remove(TranslationTextBoxs[i]);
         }
-        TranslationTextBoxs.Last.Value.Text = "";
-        AddWord.Visible = false;
+        TranslationTextBoxs.RemoveRange(1, TranslationTextBoxs.Count - 1);
+        TranslationTextBoxs[0].Text = "";
+        AddWordButton.Visible = false;
+        ClearButton.Visible = false;
     }
 
     private void SetVisible(object sender, EventArgs e)
@@ -124,8 +154,9 @@ public sealed class FormAddWordsOrText : FormStruct
         WordOrTextLabel.Visible = true;
         WordOrTextTextBox.Visible = true;
         TranslationPanel.Visible = true;
-        AddWord.Visible = true;
+        AddWordButton.Visible = true;
+        ClearButton.Visible = true;
     }
 
-    public override void FormButton(EventHandler e) => AddWord.Click += e;
+    public void AddWordOrTextEvent(EventHandler e) => AddWordButton.Click += e;
 }
