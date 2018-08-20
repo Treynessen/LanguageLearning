@@ -10,13 +10,14 @@ namespace repetition_of_English_words
     {
         FileStream data_file = null;
         WordsAndTexts data;
-        LinkedList<Pair> incomprehensible;
+        LinkedList<Pair> incomprehensible; // Плохо усвоенные слова
         LinkedList<Pair> words_and_texts_was; //
-        int[] words_filled_cells;
-        int[] texts_filled_cells;
-        FormAddWordsOrText add_word_form, add_text_form;
-        StartForm start_form;
+        int[] words_filled_cells; // Номера заполненных ячеек в хэш-таблице Words
+        int[] texts_filled_cells; // Номера заполненных ячеек в хэш-таблице Texts
+        FormAddWordsOrText add_word_form, add_text_form; // Формы добавления слов и текста
+        StartForm start_form; // Форма, открывающаяся по нажатию кнопки "Начать"
 
+        // Возвращает слово или текст из хэш-таблицы
         public Pair WordOrText
         {
             get
@@ -62,6 +63,7 @@ namespace repetition_of_English_words
             add_word_form = new FormAddWordsOrText(this, AddWordsButton, BackToMainForm, FormStruct.Form.AddWordForm);
             add_text_form = new FormAddWordsOrText(this, AddTextsButton, BackToMainForm, FormStruct.Form.AddTextForm);
             start_form = new StartForm(this, StartButton, BackToMainForm);
+            // Событие для кнопок добавить слово/текст
             add_word_form.AddWordOrTextEvent((_sender, _e) =>
             {
                 string word = add_word_form.WordOrText;
@@ -94,6 +96,7 @@ namespace repetition_of_English_words
                     GetFilledCells();
                 }
             });
+            // Событие для кнопки проверить
             start_form.CheckEvent((_sender, _e) =>
             {
                 string word_or_text = start_form.WordOrText;
@@ -147,6 +150,7 @@ namespace repetition_of_English_words
                     }
                 }
             });
+            // Проверка наличия файла со словарем
             try
             {
                 data_file = new FileStream("words.data", FileMode.Open);
@@ -157,7 +161,7 @@ namespace repetition_of_English_words
                 StartButton.Enabled = false;
                 return;
             }
-            Serialize serialize = Serialize.DesirializeFromFile(data_file);
+            Container serialize = Serialize.DesirializeFromFile(data_file);
             if (serialize == null)
             {
                 data_file.Close();
@@ -167,7 +171,7 @@ namespace repetition_of_English_words
             }
             data = new WordsAndTexts(serialize.Words, serialize.Texts);
             incomprehensible = serialize.Incomprehensible;
-            GetFilledCells();
+            GetFilledCells(); // Заполнение массивов, хранящих количество заполненных ячеек в хэш-таблицах
         }
 
         private void StartButton_Click(object sender, EventArgs e)
@@ -175,7 +179,7 @@ namespace repetition_of_English_words
             StartButton.Visible = false;
             AddWordsButton.Visible = false;
             AddTextsButton.Visible = false;
-            start_form.SetWordOrText(WordOrText);
+            start_form.SetWordOrText(WordOrText); // Слово для тестирования
         }
 
         private void AddWordsButton_Click(object sender, EventArgs e)
@@ -204,11 +208,12 @@ namespace repetition_of_English_words
             if (data != null && incomprehensible != null)
             {
                 using (data_file = new FileStream("words.data", FileMode.Truncate))
-                    Serialize.SerializeToFile(data_file, new Serialize(data.Words, data.Texts, incomprehensible));
+                    Serialize.SerializeToFile(data_file, new Container(data.Words, data.Texts, incomprehensible));
             }
 
         }
 
+        // Заполнение массивов, хранящих количество заполненных ячеек в хэш-таблицах
         private void GetFilledCells()
         {
             int count_words = 0, count_texts = 0;
