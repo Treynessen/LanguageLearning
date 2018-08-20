@@ -158,5 +158,7 @@ public sealed class FormAddWordsOrText : FormStruct
         ClearButton.Visible = true;
     }
 
+    public void Clear() => ClearButton.PerformClick();
+
     public void AddWordOrTextEvent(EventHandler e) => AddWordButton.Click += e;
 }

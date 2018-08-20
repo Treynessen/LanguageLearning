@@ -2,7 +2,9 @@
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
-using Pair = System.Collections.Generic.KeyValuePair<string, WordsAndTexts.Type>;
+using KeyListPair = System.Collections.Generic.KeyValuePair<string, System.Collections.Generic.LinkedList<string>>;
+using Pair = System.Collections.Generic.KeyValuePair<System.Collections.Generic.KeyValuePair<string, System.Collections.Generic.LinkedList<string>>, WordsAndTexts.Type>;
+using StringList = System.Collections.Generic.LinkedList<string>;
 
 namespace repetition_of_English_words
 {
@@ -23,8 +25,8 @@ namespace repetition_of_English_words
             get
             {
                 Random rand = new Random();
-                int rand_num;
-                if (words_filled_cells.Length == 0 && texts_filled_cells.Length == 0) return new Pair("", WordsAndTexts.Type.None);
+                int rand_num = 0;
+                if (words_filled_cells.Length == 0 && texts_filled_cells.Length == 0) return new Pair(new KeyListPair("", null), WordsAndTexts.Type.None);
                 else if (words_filled_cells.Length == 0) rand_num = 1;
                 else if (texts_filled_cells.Length == 0) rand_num = 0;
                 else if (incomprehensible.Count > 0) rand_num = rand.Next(0, 3);
@@ -35,7 +37,7 @@ namespace repetition_of_English_words
                     index = words_filled_cells[index];
                     rand_num = rand.Next(0, data.Words[index].Count);
                     int count = 0;
-                    foreach (var w in data.Words[index]) if (count++ >= rand_num) return new Pair(w.Key, WordsAndTexts.Type.Word);
+                    foreach (var w in data.Words[index]) if (count++ >= rand_num) return new Pair(w, WordsAndTexts.Type.Word);
                 }
                 else if (rand_num == 1)
                 {
@@ -43,13 +45,13 @@ namespace repetition_of_English_words
                     index = texts_filled_cells[index];
                     rand_num = rand.Next(0, data.Texts[index].Count);
                     int count = 0;
-                    foreach (var w in data.Texts[index]) if (count++ >= rand_num) return new Pair(w.Key, WordsAndTexts.Type.Text);
+                    foreach (var w in data.Texts[index]) if (count++ >= rand_num) return new Pair(w, WordsAndTexts.Type.Text);
                 }
                 else
                 {
                     return incomprehensible.First.Value;
                 }
-                return new Pair(data.Words[words_filled_cells[0]].First.Value.Key, WordsAndTexts.Type.Word);
+                return new Pair(data.Words[words_filled_cells[0]].First.Value, WordsAndTexts.Type.Word);
             }
         }
 
@@ -63,12 +65,16 @@ namespace repetition_of_English_words
             add_word_form = new FormAddWordsOrText(this, AddWordsButton, BackToMainForm, FormStruct.Form.AddWordForm);
             add_text_form = new FormAddWordsOrText(this, AddTextsButton, BackToMainForm, FormStruct.Form.AddTextForm);
             start_form = new StartForm(this, StartButton, BackToMainForm);
-            // Событие для кнопок добавить слово/текст
+            // События для кнопок добавить слово/текст
             add_word_form.AddWordOrTextEvent((_sender, _e) =>
             {
                 string word = add_word_form.WordOrText;
                 if (word != "")
                 {
+                    if (data_file == null) data_file = new FileStream("words.data", FileMode.Create);
+                    if (data == null) data = new WordsAndTexts();
+                    if (incomprehensible == null) incomprehensible = new LinkedList<Pair>();
+
                     string[] translations = add_word_form.Translations;
                     if (translations.Length == 1) data.AddWord(word, translations[0]);
                     else if (translations.Length == 2) data.AddWord(word, translations[0], translations[1]);
@@ -77,7 +83,9 @@ namespace repetition_of_English_words
                     else if (translations.Length == 5) data.AddWord(word, translations[0], translations[1], translations[2], translations[3], translations[4]);
                     else if (translations.Length > 5) data.AddWord(word, translations);
                     StartButton.Enabled = true;
+                    add_word_form.Clear();
                     GetFilledCells();
+                    MessageBox.Show("Добавлено в словарь");
                 }
             });
             add_text_form.AddWordOrTextEvent((_sender, _e) =>
@@ -85,6 +93,10 @@ namespace repetition_of_English_words
                 string text = add_text_form.WordOrText;
                 if (text != "")
                 {
+                    if (data_file == null) data_file = new FileStream("words.data", FileMode.Create);
+                    if (data == null) data = new WordsAndTexts();
+                    if (incomprehensible == null) incomprehensible = new LinkedList<Pair>();
+
                     string[] translations = add_text_form.Translations;
                     if (translations.Length == 1) data.AddText(text, translations[0]);
                     else if (translations.Length == 2) data.AddText(text, translations[0], translations[1]);
@@ -93,62 +105,61 @@ namespace repetition_of_English_words
                     else if (translations.Length == 5) data.AddText(text, translations[0], translations[1], translations[2], translations[3], translations[4]);
                     else if (translations.Length > 5) data.AddText(text, translations);
                     StartButton.Enabled = true;
+                    add_word_form.Clear();
                     GetFilledCells();
+                    MessageBox.Show("Добавлено в словарь");
                 }
             });
-            // Событие для кнопки проверить
+            // Событие для кнопки "Проверить"
             start_form.CheckEvent((_sender, _e) =>
             {
                 string word_or_text = start_form.WordOrText;
-                string translate = start_form.Translation;
-                if (start_form.Type == WordsAndTexts.Type.Text)
+                if (word_or_text != "")
                 {
-                    int index = data.GetIndex(word_or_text, data.Texts.Length);
-                    LinkedList<string> translates = null;
-                    foreach (var kv in data.Texts[index])
+                    bool right = start_form.Check();
+                    if (right) start_form.SetText(true);
+                    else
                     {
-                        if (kv.Key == word_or_text)
-                        {
-                            translates = kv.Value;
-                            break;
-                        }
-                    }
-                    if (translates != null)
-                    {
-                        if (translates.Find(translate) != null)
-                        {
-                            start_form.SetWordOrText(WordOrText);
-                        }
+                        if (start_form.WordOrTranslation == StartForm.WordType.Original) start_form.SetText(false);
                         else
                         {
-
+                            string translation = start_form.Translation;
+                            LinkedList<KeyValuePair<string, StringList>> list = null;
+                            if (start_form.Type == WordsAndTexts.Type.Text) list = data.Texts[data.GetIndex(translation, data.Texts.Length)];
+                            else list = data.Words[data.GetIndex(translation, data.Words.Length)];
+                            if (list != null)
+                            {
+                                string word = start_form.WordOrText;
+                                bool find = false;
+                                foreach (var l in list)
+                                {
+                                    if (l.Key == translation)
+                                    {
+                                        foreach (var v in l.Value)
+                                        {
+                                            if (v == word)
+                                            {
+                                                start_form.SetText(true);
+                                                find = true;
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                                if (!find) start_form.SetText(false);
+                            }
+                            else start_form.SetText(false);
                         }
                     }
                 }
-                else if (start_form.Type == WordsAndTexts.Type.Word)
-                {
-                    int index = data.GetIndex(word_or_text, data.Words.Length);
-                    LinkedList<string> translates = null;
-                    foreach (var kv in data.Words[index])
-                    {
-                        if (kv.Key == word_or_text)
-                        {
-                            translates = kv.Value;
-                            break;
-                        }
-                    }
-                    if (translates != null)
-                    {
-                        if (translates.Find(translate) != null)
-                        {
-                            start_form.SetWordOrText(WordOrText);
-                        }
-                        else
-                        {
-
-                        }
-                    }
-                }
+                else MessageBox.Show("Словарь не заполнен", "Ошибка");
+            });
+            // Событие для кнопки "Далее"
+            start_form.NextButtonEvent((_sender, _e) =>
+            {
+                start_form.SetWordOrText(WordOrText);
+                start_form.ClearText();
             });
             // Проверка наличия файла со словарем
             try
@@ -187,9 +198,6 @@ namespace repetition_of_English_words
             StartButton.Visible = false;
             AddWordsButton.Visible = false;
             AddTextsButton.Visible = false;
-            if (data_file == null) data_file = new FileStream("words.data", FileMode.Create);
-            if (data == null) data = new WordsAndTexts();
-            if (incomprehensible == null) incomprehensible = new LinkedList<Pair>();
         }
 
         private void AddTextsButton_Click(object sender, EventArgs e)
@@ -197,9 +205,6 @@ namespace repetition_of_English_words
             StartButton.Visible = false;
             AddWordsButton.Visible = false;
             AddTextsButton.Visible = false;
-            if (data_file == null) data_file = new FileStream("words.data", FileMode.Create);
-            if (data == null) data = new WordsAndTexts();
-            if (incomprehensible == null) incomprehensible = new LinkedList<Pair>();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
