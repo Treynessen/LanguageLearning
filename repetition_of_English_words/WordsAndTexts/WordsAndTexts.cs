@@ -23,7 +23,7 @@ public partial class WordsAndTexts
     {
         int index = 0;
         for (int i = 0; i < str.Length; ++i) index += str[i];
-        return index = index % arr_length;
+        return index % arr_length;
     }
 
     StringList CheckKeysInWords(int index, string word)
