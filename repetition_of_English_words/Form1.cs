@@ -86,6 +86,7 @@ namespace repetition_of_English_words
                     else if (translations.Length == 5) data.AddWord(word, translations[0], translations[1], translations[2], translations[3], translations[4]);
                     else if (translations.Length > 5) data.AddWord(word, translations);
                     StartButton.Enabled = true;
+                    DictionaryEdit.Enabled = true;
                     add_word_form.Clear();
                     GetFilledCells();
                     MessageBox.Show("Добавлено в словарь");
@@ -108,6 +109,7 @@ namespace repetition_of_English_words
                     else if (translations.Length == 5) data.AddText(text, translations[0], translations[1], translations[2], translations[3], translations[4]);
                     else if (translations.Length > 5) data.AddText(text, translations);
                     StartButton.Enabled = true;
+                    DictionaryEdit.Enabled = true;
                     add_text_form.Clear();
                     GetFilledCells();
                     MessageBox.Show("Добавлено в словарь");
@@ -167,8 +169,6 @@ namespace repetition_of_English_words
                 start_form.ClearText();
             });
             
-
-
             // Проверка наличия файла со словарем
             try
             {
@@ -178,6 +178,7 @@ namespace repetition_of_English_words
             {
                 MessageBox.Show("Файл со словарем не найден");
                 StartButton.Enabled = false;
+                DictionaryEdit.Enabled = false;
                 return;
             }
             Container serialize = Serialize.DesirializeFromFile(data_file);
@@ -225,7 +226,7 @@ namespace repetition_of_English_words
             AddWordsButton.Visible = false;
             AddTextsButton.Visible = false;
             DictionaryEdit.Visible = false;
-            dictionary_edit.WordsAndTextsData(data.Words, data.Texts, words_filled_cells, texts_filled_cells);
+            dictionary_edit.WordsAndTextsData(data.Words, data.Texts);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
