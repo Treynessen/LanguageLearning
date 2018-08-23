@@ -18,8 +18,9 @@ public sealed class StartForm : FormStruct
     private string word;
     private LinkedList<string> translation;
 
-    public string WordOrText { get { return WordOrTextTextBox.Text; } }
-    public string Translation { get { return TranslationTextBox.Text.ToLower(); } }
+    public string WordOrText =>  WordOrTextTextBox.Text;
+    public string Translation => TranslationTextBox.Text.ToLower(); 
+
     public WordType WordOrTranslation { get; private set; } // в качестве слова используется ключ или значение
     public WordsAndTexts.Type Type { get; private set; } // слово или текст
 

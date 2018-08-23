@@ -18,6 +18,7 @@ namespace repetition_of_English_words
         int[] texts_filled_cells; // Номера заполненных ячеек в хэш-таблице Texts
         FormAddWordsOrText add_word_form, add_text_form; // Формы добавления слов и текста
         StartForm start_form; // Форма, открывающаяся по нажатию кнопки "Начать"
+        DictionaryEdit dictionary_edit; // Форма редактирования словаря
 
         // Возвращает слово или текст из хэш-таблицы
         public Pair WordOrText
@@ -65,6 +66,8 @@ namespace repetition_of_English_words
             add_word_form = new FormAddWordsOrText(this, AddWordsButton, BackToMainForm, FormStruct.Form.AddWordForm);
             add_text_form = new FormAddWordsOrText(this, AddTextsButton, BackToMainForm, FormStruct.Form.AddTextForm);
             start_form = new StartForm(this, StartButton, BackToMainForm);
+            dictionary_edit = new DictionaryEdit(this, DictionaryEdit, BackToMainForm);
+
             // События для кнопок добавить слово/текст
             add_word_form.AddWordOrTextEvent((_sender, _e) =>
             {
@@ -105,11 +108,12 @@ namespace repetition_of_English_words
                     else if (translations.Length == 5) data.AddText(text, translations[0], translations[1], translations[2], translations[3], translations[4]);
                     else if (translations.Length > 5) data.AddText(text, translations);
                     StartButton.Enabled = true;
-                    add_word_form.Clear();
+                    add_text_form.Clear();
                     GetFilledCells();
                     MessageBox.Show("Добавлено в словарь");
                 }
             });
+            
             // Событие для кнопки "Проверить"
             start_form.CheckEvent((_sender, _e) =>
             {
@@ -155,12 +159,16 @@ namespace repetition_of_English_words
                 }
                 else MessageBox.Show("Словарь не заполнен", "Ошибка");
             });
+            
             // Событие для кнопки "Далее"
             start_form.NextButtonEvent((_sender, _e) =>
             {
                 start_form.SetWordOrText(WordOrText);
                 start_form.ClearText();
             });
+            
+
+
             // Проверка наличия файла со словарем
             try
             {
@@ -180,6 +188,7 @@ namespace repetition_of_English_words
                 StartButton.Enabled = false;
                 return;
             }
+
             data = new WordsAndTexts(serialize.Words, serialize.Texts);
             incomprehensible = serialize.Incomprehensible;
             GetFilledCells(); // Заполнение массивов, хранящих количество заполненных ячеек в хэш-таблицах
@@ -190,6 +199,7 @@ namespace repetition_of_English_words
             StartButton.Visible = false;
             AddWordsButton.Visible = false;
             AddTextsButton.Visible = false;
+            DictionaryEdit.Visible = false;
             start_form.SetWordOrText(WordOrText); // Слово для тестирования
         }
 
@@ -198,6 +208,7 @@ namespace repetition_of_English_words
             StartButton.Visible = false;
             AddWordsButton.Visible = false;
             AddTextsButton.Visible = false;
+            DictionaryEdit.Visible = false;
         }
 
         private void AddTextsButton_Click(object sender, EventArgs e)
@@ -205,6 +216,16 @@ namespace repetition_of_English_words
             StartButton.Visible = false;
             AddWordsButton.Visible = false;
             AddTextsButton.Visible = false;
+            DictionaryEdit.Visible = false;
+        }
+
+        private void DictionaryEdit_Click(object sender, EventArgs e)
+        {
+            StartButton.Visible = false;
+            AddWordsButton.Visible = false;
+            AddTextsButton.Visible = false;
+            DictionaryEdit.Visible = false;
+            dictionary_edit.WordsAndTextsData(data.Words, data.Texts, words_filled_cells, texts_filled_cells);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -242,6 +263,7 @@ namespace repetition_of_English_words
             StartButton.Visible = true;
             AddWordsButton.Visible = true;
             AddTextsButton.Visible = true;
+            DictionaryEdit.Visible = true;
         }
     }
 }
