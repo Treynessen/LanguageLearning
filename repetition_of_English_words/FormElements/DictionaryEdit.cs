@@ -265,6 +265,7 @@ public sealed class DictionaryEdit : FormStruct
         TranslationPanel.Visible = true;
         SaveChangesButton.Visible = true;
         DeleteWordButton.Visible = true;
+        WordsCheckBox.Checked = true;
         translation_text_boxes_visible = 1;
     }
 
