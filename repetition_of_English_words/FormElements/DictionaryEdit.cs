@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using repetition_of_English_words;
 using StringList = System.Collections.Generic.LinkedList<string>;
 
+public delegate void WordsOrTextDeliter(string key, WordsAndTexts.Type type);
+
 public sealed class DictionaryEdit : FormStruct
 {
     private Label WordsOrTextsLabel;
@@ -26,7 +28,7 @@ public sealed class DictionaryEdit : FormStruct
     private string[] words;
     private string[] texts;
 
-    public DictionaryEdit(Form1 form, Button activate_button, EventHandler back_main_form)
+    public DictionaryEdit(Form1 form, Button activate_button, EventHandler back_main_form, WordsOrTextDeliter words_or_text_deliter)
         : base(form, activate_button, back_main_form)
     {
         activate_button.Click += SetVisible;
@@ -98,12 +100,15 @@ public sealed class DictionaryEdit : FormStruct
         WordsOrTextsComboBox.SelectedIndexChanged += (sender, e) =>
         {
             StringList translations;
+            // Получение списка переводов
             if (WordsCheckBox.Checked) translations = words_with_translate.ElementAt(WordsOrTextsComboBox.SelectedIndex).Value;
             else translations = texts_with_translate.ElementAt(WordsOrTextsComboBox.SelectedIndex).Value;
+            // Если нет поля для перевода, то добавляем его
             if (TranslationTextBoxs.Count < translations.Count)
             {
                 while (TranslationTextBoxs.Count < translations.Count) AddTranslationTextBox();
             }
+            // Если поле есть, но оно невидимо, то делаем его видимым
             if (translation_text_boxes_visible < translations.Count)
             {
                 while (translation_text_boxes_visible < translations.Count)
@@ -113,6 +118,7 @@ public sealed class DictionaryEdit : FormStruct
                     ++translation_text_boxes_visible;
                 }
             }
+            // Если полей слишком много, то делаем их невидимыми
             else if (translation_text_boxes_visible > translations.Count)
             {
                 while (translation_text_boxes_visible > translations.Count)
@@ -123,6 +129,7 @@ public sealed class DictionaryEdit : FormStruct
                 }
             }
             int it = 0;
+            // Заполняем поля с переводом
             foreach (var translation in translations)
             {
                 TranslationTextBoxs[it++].Text = translation;
@@ -139,7 +146,19 @@ public sealed class DictionaryEdit : FormStruct
         DeleteWordButton.Visible = false;
         DeleteWordButton.Click += (sender, e) =>
         {
-
+            if (WordsOrTextsComboBox.Text != "")
+            {
+                words_or_text_deliter(WordsOrTextsComboBox.Text, TextsCheckBox.Checked ? WordsAndTexts.Type.Text : WordsAndTexts.Type.Word);
+                WordsOrTextsComboBox.Items.Remove(WordsOrTextsComboBox.Text);
+                // Если у слова было несколько вариантов перевода, то закрываем поля
+                while (translation_text_boxes_visible > 1)
+                {
+                    --translation_text_boxes_visible;
+                    TranslationTextBoxs[translation_text_boxes_visible].Visible = false;
+                    DeleteTranslationButton[translation_text_boxes_visible].Visible = false;
+                }
+                TranslationTextBoxs[0].Text = "";
+            }
         };
         form.Controls.Add(DeleteWordButton);
 
@@ -166,12 +185,28 @@ public sealed class DictionaryEdit : FormStruct
         TranslationTextBoxs[0].Location = new Point(167, 30);
         TranslationPanel.Controls.Add(TranslationTextBoxs[0]);
 
+        // Переделать название на AddButton!!!!!!!!!
         DeleteTranslationButton = new List<Button>();
         DeleteTranslationButton.Add(new Button());
         DeleteTranslationButton[0].Font = text_font;
         DeleteTranslationButton[0].Width = 34;
         DeleteTranslationButton[0].Height = 34;
-        DeleteTranslationButton[0].Text = "-";
+        DeleteTranslationButton[0].Text = "+";
+        DeleteTranslationButton[0].Click += (sender, e) =>
+        {
+            // Если поле уже существует, то делаем его видимым
+            if (TranslationTextBoxs.Count > translation_text_boxes_visible)
+            {
+                TranslationTextBoxs[translation_text_boxes_visible].Visible = true;
+                TranslationTextBoxs[translation_text_boxes_visible++].Text = "";
+            }
+            // Если полей нет, то добавляем
+            else
+            {
+                AddTranslationTextBox();
+                TranslationTextBoxs[translation_text_boxes_visible++].Visible = true;
+            }
+        };
         DeleteTranslationButton[0].Location = new Point(726, 29);
         TranslationPanel.Controls.Add(DeleteTranslationButton[0]);
 
@@ -189,12 +224,39 @@ public sealed class DictionaryEdit : FormStruct
             if (WordsOrTextsComboBox.Text != "")
             {
                 LinkedListNode<string> current_node;
+                // Получение узла
                 if (WordsCheckBox.Checked) current_node = words_with_translate.ElementAt(WordsOrTextsComboBox.SelectedIndex).Value.First;
                 else current_node = texts_with_translate.ElementAt(WordsOrTextsComboBox.SelectedIndex).Value.First;
+
+                // Если добавлены новые варианты перевода
+                if (current_node.List.Count < translation_text_boxes_visible)
+                {
+                    LinkedListNode<string> temp = current_node;
+                    bool have = false;
+                    for (int i = current_node.List.Count; i < translation_text_boxes_visible; ++i)
+                    {
+                        if (TranslationTextBoxs[i].Text == "") continue;
+                        while (temp != null)
+                        {
+                            if (temp.Value == TranslationTextBoxs[i].Text.ToLower())
+                            {
+                                have = true;
+                                break;
+                            }
+                            temp = temp.Next;
+                        }
+                        temp = current_node;
+                        if (!have) current_node.List.AddLast(TranslationTextBoxs[i].Text.ToLower());
+                        have = false;
+                    }
+                }
+
+                // Запись изменений, если они были
                 for (int i = 0; i < translation_text_boxes_visible; ++i)
                 {
-                    if (current_node.Value != TranslationTextBoxs[i].Text) current_node.Value = TranslationTextBoxs[i].Text;
-                    current_node = current_node.Next;
+                    if (TranslationTextBoxs[i].Text == "") continue;
+                    if (current_node != null && current_node.Value != TranslationTextBoxs[i].Text.ToLower()) current_node.Value = TranslationTextBoxs[i].Text.ToLower();
+                    if (current_node != null) current_node = current_node.Next;
                 }
                 MessageBox.Show("Изменения сохранены");
             }

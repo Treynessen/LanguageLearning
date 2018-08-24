@@ -30,7 +30,7 @@ namespace repetition_of_English_words
                 if (words_filled_cells.Length == 0 && texts_filled_cells.Length == 0) return new Pair(new KeyListPair("", null), WordsAndTexts.Type.None);
                 else if (words_filled_cells.Length == 0) rand_num = 1;
                 else if (texts_filled_cells.Length == 0) rand_num = 0;
-                else if (incomprehensible.Count > 0) rand_num = rand.Next(0, 3);
+                else if (incomprehensible.Count > 0) rand_num = rand.Next(0, 4);
                 else rand_num = rand.Next(0, 2);
                 if (rand_num == 0)
                 {
@@ -66,7 +66,7 @@ namespace repetition_of_English_words
             add_word_form = new FormAddWordsOrText(this, AddWordsButton, BackToMainForm, FormStruct.Form.AddWordForm);
             add_text_form = new FormAddWordsOrText(this, AddTextsButton, BackToMainForm, FormStruct.Form.AddTextForm);
             start_form = new StartForm(this, StartButton, BackToMainForm);
-            dictionary_edit = new DictionaryEdit(this, DictionaryEdit, BackToMainForm);
+            dictionary_edit = new DictionaryEdit(this, DictionaryEdit, BackToMainForm, DeleteWordOrText);
 
             // События для кнопок добавить слово/текст
             add_word_form.AddWordOrTextEvent((_sender, _e) =>
@@ -197,35 +197,23 @@ namespace repetition_of_English_words
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            StartButton.Visible = false;
-            AddWordsButton.Visible = false;
-            AddTextsButton.Visible = false;
-            DictionaryEdit.Visible = false;
+            LeaveMainForm();
             start_form.SetWordOrText(WordOrText); // Слово для тестирования
         }
 
         private void AddWordsButton_Click(object sender, EventArgs e)
         {
-            StartButton.Visible = false;
-            AddWordsButton.Visible = false;
-            AddTextsButton.Visible = false;
-            DictionaryEdit.Visible = false;
+            LeaveMainForm();
         }
 
         private void AddTextsButton_Click(object sender, EventArgs e)
         {
-            StartButton.Visible = false;
-            AddWordsButton.Visible = false;
-            AddTextsButton.Visible = false;
-            DictionaryEdit.Visible = false;
+            LeaveMainForm();
         }
 
         private void DictionaryEdit_Click(object sender, EventArgs e)
         {
-            StartButton.Visible = false;
-            AddWordsButton.Visible = false;
-            AddTextsButton.Visible = false;
-            DictionaryEdit.Visible = false;
+            LeaveMainForm();
             dictionary_edit.WordsAndTextsData(data.Words, data.Texts);
         }
 
@@ -259,12 +247,48 @@ namespace repetition_of_English_words
 
         }
 
+        private void LeaveMainForm()
+        {
+            StartButton.Visible = false;
+            AddWordsButton.Visible = false;
+            AddTextsButton.Visible = false;
+            DictionaryEdit.Visible = false;
+        }
+
         private void BackToMainForm(object sender, EventArgs e)
         {
             StartButton.Visible = true;
             AddWordsButton.Visible = true;
             AddTextsButton.Visible = true;
             DictionaryEdit.Visible = true;
+        }
+
+        private void DeleteWordOrText(string key, WordsAndTexts.Type type)
+        {
+            if(type == WordsAndTexts.Type.Text)
+            {
+                var pairs = data.Texts[data.GetIndex(key, data.Texts.Length)];
+                foreach(var pair in pairs)
+                {
+                    if (pair.Key == key)
+                    {
+                        pairs.Remove(pair);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                var pairs = data.Words[data.GetIndex(key, data.Words.Length)];
+                foreach (var pair in pairs)
+                {
+                    if (pair.Key == key)
+                    {
+                        pairs.Remove(pair);
+                        break;
+                    }
+                }
+            }
         }
     }
 }
