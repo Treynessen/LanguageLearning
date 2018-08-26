@@ -276,6 +276,19 @@ public sealed class DictionaryEditForm : FormStruct
         {
             if (WordsOrTextsComboBox.Text != string.Empty && translation_text_boxes_visible > 0)
             {
+
+                int count_text_boxes_with_text = 0;
+                for (int i = 0; i < translation_text_boxes_visible; ++i)
+                {
+                    if (TranslationTextBoxes[i].Text != string.Empty) ++count_text_boxes_with_text;
+                }
+
+                if (count_text_boxes_with_text == 0)
+                {
+                    MessageBox.Show(translation_text_boxes_visible > 1 ? "Поля не содержат перевод" : "Поле не содержит перевод", "Ошибка");
+                    return;
+                }
+
                 // Получение узла
                 LinkedListNode<string> current_node = null;
                 if (WordsCheckBox.Checked)
@@ -445,7 +458,7 @@ public sealed class DictionaryEditForm : FormStruct
                         if (WordsOrTextsComboBox.Text == pair.Key)
                         {
                             var node = pair.Value.Find(TranslationTextBoxes[text_box_index].Text.ToLower());
-                            if (node != null)
+                            if (node != null && pair.Value.Count > 1)
                             {
                                 success = true;
                                 pair.Value.Remove(node);
@@ -454,7 +467,7 @@ public sealed class DictionaryEditForm : FormStruct
                         }
                     }
                     if (success) MessageBox.Show("Перевод удален");
-                    else MessageBox.Show("Такого перевода нет в списке");
+                    else MessageBox.Show("Ошибка при удалении перевода", "Ошибка");
                 }
                 else
                 {
@@ -464,7 +477,7 @@ public sealed class DictionaryEditForm : FormStruct
                         if (WordsOrTextsComboBox.Text == pair.Key)
                         {
                             var node = pair.Value.Find(TranslationTextBoxes[text_box_index].Text.ToLower());
-                            if (node != null)
+                            if (node != null && pair.Value.Count > 1)
                             {
                                 success = true;
                                 pair.Value.Remove(node);
@@ -473,7 +486,7 @@ public sealed class DictionaryEditForm : FormStruct
                         }
                     }
                     if (success) MessageBox.Show("Перевод удален");
-                    else MessageBox.Show("Такого перевода нет в списке");
+                    else MessageBox.Show("Ошибка при удалении перевода", "Ошибка");
                 }
             }
             else

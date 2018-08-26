@@ -150,9 +150,9 @@ public sealed class AddWordsOrTextForms : FormStruct
 
         ClearButton = new Button();
         ClearButton.Font = button_font;
-        ClearButton.Width = 180;
+        ClearButton.Width = 150;
         ClearButton.Height = 50;
-        ClearButton.Location = new Point(309, 511);
+        ClearButton.Location = new Point(339, 511);
         ClearButton.Text = "Очистить";
         ClearButton.Visible = false;
         ClearButton.Click += (sender, e) =>
