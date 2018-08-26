@@ -243,13 +243,16 @@ public sealed class TrainingForm : FormStruct
                         if_russian_word_or_text = form.Data.Words[index].ElementAt(list_index).Key;
                     }
 
-                    // Если не заполнен, то продолжаем заполнение
-                    if (words_was.Count < words_was_count) words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
-                    // Иначе удаляем первое значение из очереди и добавляем слово в конец списка
-                    else
+                    if (words_was.Count > 0)
                     {
-                        words_was.RemoveFirst();
-                        words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
+                        // Если не заполнен, то продолжаем заполнение
+                        if (words_was.Count < words_was_count) words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
+                        // Иначе удаляем первое значение из очереди и добавляем слово в конец списка
+                        else
+                        {
+                            words_was.RemoveFirst();
+                            words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
+                        }
                     }
                 }
                 // Выбор предложения
@@ -290,13 +293,17 @@ public sealed class TrainingForm : FormStruct
                         WordOrTextTextBox.Text = form.Data.Texts[index].ElementAt(list_index).Value.ElementAt(translation_index);
                         if_russian_word_or_text = form.Data.Texts[index].ElementAt(list_index).Key;
                     }
-                    // Если не заполнен, то продолжаем заполнение
-                    if (texts_was.Count < texts_was_count) texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
-                    // Иначе удаляем первое значение из очереди и добавляем текст в конец списка
-                    else
+
+                    if (texts_was.Count > 0)
                     {
-                        texts_was.RemoveFirst();
-                        texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
+                        // Если не заполнен, то продолжаем заполнение
+                        if (texts_was.Count < texts_was_count) texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
+                        // Иначе удаляем первое значение из очереди и добавляем текст в конец списка
+                        else
+                        {
+                            texts_was.RemoveFirst();
+                            texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
+                        }
                     }
                 }
                 // Выбор из списка плохо усвоенных слов или предложений
