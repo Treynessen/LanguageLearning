@@ -10,7 +10,6 @@ public partial class WordsAndTextsData
     {
         Words = new LinkedList<KeyValuePair<string, LinkedListWithTranslations>>[500];
         Texts = new LinkedList<KeyValuePair<string, LinkedListWithTranslations>>[1000];
-
     }
 
     public WordsAndTextsData(LinkedList<KeyValuePair<string, LinkedListWithTranslations>>[] words,

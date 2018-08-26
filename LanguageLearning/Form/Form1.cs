@@ -18,7 +18,7 @@ public partial class Form1 : Form
 
     private void Form1_Load(object sender, EventArgs e)
     {
-        training_form = new TrainingForm(this, TrainingButton);
+        training_form = new TrainingForm(this, TrainingButton, AddIncomprehensible);
         add_word_form = new AddWordsOrTextForms(this, AddWordsButton, CreateData, AddWordsOrTextForms.AddWordsOrTextFormsType.AddWordForm);
         add_text_form = new AddWordsOrTextForms(this, AddTextsButton, CreateData, AddWordsOrTextForms.AddWordsOrTextFormsType.AddTextForm);
         dictionary_edit_form = new DictionaryEditForm(this, DictionaryEditButton);
@@ -110,6 +110,12 @@ public partial class Form1 : Form
         DictionaryEditButton.Enabled = true;
         TrainingButton.Enabled = true;
         Data = new WordsAndTextsData();
+    }
+
+    private void AddIncomprehensible(IncomprehensiblePair pair)
+    {
+        if (Incomprehensible == null) Incomprehensible = new LinkedList<IncomprehensiblePair>();
+        Incomprehensible.AddLast(pair);
     }
 
     /*================================================*/
