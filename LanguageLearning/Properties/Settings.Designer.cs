@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace repetition_of_English_words.Properties
+namespace LanguageLearning.Properties
 {
 
 

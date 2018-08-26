@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CDA7B54A-F22E-4EBB-AC4C-6B338EDF4945}</ProjectGuid>
+    <ProjectGuid>{5D117772-9AEF-4149-8212-E0315E55A047}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>repetition_of_English_words</RootNamespace>
-    <AssemblyName>repetition_of_English_words</AssemblyName>
+    <RootNamespace>LanguageLearning</RootNamespace>
+    <AssemblyName>LanguageLearning</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -45,26 +45,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FormElements\AddWordOrTextElements.cs" />
-    <Compile Include="FormElements\DictionaryEdit.cs" />
-    <Compile Include="FormElements\StartForm.cs" />
-    <Compile Include="FormElements\FormStruct.cs" />
-    <Compile Include="Serialize\Container.cs" />
-    <Compile Include="Serialize\Serialize.cs" />
-    <Compile Include="WordsAndTexts\WordsAndTexts AddWordTranslation.cs" />
-    <Compile Include="WordsAndTexts\WordsAndTexts AddTextTranslation.cs" />
-    <Compile Include="WordsAndTexts\WordsAndTexts AddTexts.cs" />
-    <Compile Include="WordsAndTexts\WordsAndTexts AddWords.cs" />
-    <Compile Include="WordsAndTexts\WordsAndTexts.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="Forms\AddWordOrTextForms.cs" />
+    <Compile Include="Forms\TrainingForm.cs" />
+    <Compile Include="Forms\DictionaryEditForm.cs" />
+    <Compile Include="Forms\FormStruct.cs" />
+    <Compile Include="Form\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="Form\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Form\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
+    <Compile Include="Serialize\Container.cs" />
+    <Compile Include="Serialize\Serialize.cs" />
+    <Compile Include="WordsAndTextsData\AddWordOrText.cs" />
+    <Compile Include="WordsAndTextsData\GetWordOrTextTranslation.cs" />
+    <Compile Include="WordsAndTextsData\WordsAndTextsData.cs" />
+    <EmbeddedResource Include="Form\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -89,5 +87,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
