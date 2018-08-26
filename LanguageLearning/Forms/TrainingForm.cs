@@ -23,6 +23,10 @@ public sealed class TrainingForm : FormStruct
     private string if_russian_word_or_text = null; // Если вопрос на русском, то сюда записывается английский перевод
     private int[] words_fill_cells;
     private int[] texts_fill_cells;
+    int words_was_count = 0;
+    int texts_was_count = 0;
+    LinkedList<string> words_was;
+    LinkedList<string> texts_was;
 
     public TrainingForm(Form1 form, Button activate_form_button, Action<IncomprehensiblePair> add_incomprehensible) : base(form)
     {
@@ -212,6 +216,18 @@ public sealed class TrainingForm : FormStruct
                     } while (form.Data.Words[index] == null || form.Data.Words[index].Count == 0);
 
                     int list_index = rand.Next(0, form.Data.Words[index].Count);
+                    // Проверка, было ли это слово
+                    if (words_was.Count > 0)
+                    {
+                        foreach (var str in words_was)
+                        {
+                            if (form.Data.Words[index].ElementAt(list_index).Key == str)
+                            {
+                                NextWordOrTextButton.PerformClick();
+                                return;
+                            }
+                        }
+                    }
                     // Устанавливает в текст бокс английское слово
                     if (rand.Next(0, 2) == 0)
                     {
@@ -226,6 +242,15 @@ public sealed class TrainingForm : FormStruct
                         WordOrTextTextBox.Text = form.Data.Words[index].ElementAt(list_index).Value.ElementAt(translation_index);
                         if_russian_word_or_text = form.Data.Words[index].ElementAt(list_index).Key;
                     }
+
+                    // Если не заполнен, то продолжаем заполнение
+                    if (words_was.Count < words_was_count) words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
+                    // Иначе удаляем первое значение из очереди и добавляем слово в конец списка
+                    else
+                    {
+                        words_was.RemoveFirst();
+                        words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
+                    }
                 }
                 // Выбор предложения
                 else if (rand_num == 1)
@@ -239,6 +264,18 @@ public sealed class TrainingForm : FormStruct
                     } while (form.Data.Texts[index] == null || form.Data.Texts[index].Count == 0);
 
                     int list_index = rand.Next(0, form.Data.Texts[index].Count);
+                    // Проверка, был ли этот текст
+                    if (texts_was.Count > 0)
+                    {
+                        foreach (var str in texts_was)
+                        {
+                            if (form.Data.Texts[index].ElementAt(list_index).Key == str)
+                            {
+                                NextWordOrTextButton.PerformClick();
+                                return;
+                            }
+                        }
+                    }
                     // Устанавливает в текст бокс английский текст
                     if (rand.Next(0, 2) == 0)
                     {
@@ -252,6 +289,14 @@ public sealed class TrainingForm : FormStruct
                         int translation_index = rand.Next(0, form.Data.Texts[index].ElementAt(list_index).Value.Count);
                         WordOrTextTextBox.Text = form.Data.Texts[index].ElementAt(list_index).Value.ElementAt(translation_index);
                         if_russian_word_or_text = form.Data.Texts[index].ElementAt(list_index).Key;
+                    }
+                    // Если не заполнен, то продолжаем заполнение
+                    if (texts_was.Count < texts_was_count) texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
+                    // Иначе удаляем первое значение из очереди и добавляем текст в конец списка
+                    else
+                    {
+                        texts_was.RemoveFirst();
+                        texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
                     }
                 }
                 // Выбор из списка плохо усвоенных слов или предложений
@@ -354,6 +399,11 @@ public sealed class TrainingForm : FormStruct
             if (i < form.Data.Words.Length && form.Data.Words[i] != null && form.Data.Words[i].Count > 0) words_fill_cells[w++] = i;
             if (i < form.Data.Texts.Length && form.Data.Texts[i] != null && form.Data.Texts[i].Count > 0) texts_fill_cells[t++] = i;
         }
+        words_was_count = words_fill_cells_count / 2;
+        texts_was_count = texts_fill_cells_count / 2;
+        words_was = new LinkedList<string>();
+        texts_was = new LinkedList<string>();
+
     }
 
     private enum Language
