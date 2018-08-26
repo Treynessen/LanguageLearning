@@ -188,6 +188,17 @@ public sealed class DictionaryEditForm : FormStruct
                         break;
                     }
                 }
+
+                // Если слово было добавлено в Incomprehensible, то удаляем его 
+                foreach (var pair in form.Incomprehensible)
+                {
+                    if (pair.Key == WordsOrTextsComboBox.Text)
+                    {
+                        form.Incomprehensible.Remove(pair);
+                        break;
+                    }
+                }
+
                 // Удаление слова или предложения из выпадающего списка и из массива
                 if (WordsCheckBox.Checked) words.RemoveAt(WordsOrTextsComboBox.SelectedIndex);
                 else texts.RemoveAt(WordsOrTextsComboBox.SelectedIndex);
