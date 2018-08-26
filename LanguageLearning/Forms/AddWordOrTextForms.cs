@@ -12,6 +12,7 @@ public sealed class AddWordsOrTextForms : FormStruct
     private List<TextBox> TranslationTextBoxes;
     private Button AddTranslation;
     private Button AddWordOrTextButton;
+    private Button ClearButton;
 
     int translation_text_boxes_visible = 1;
 
@@ -99,44 +100,74 @@ public sealed class AddWordsOrTextForms : FormStruct
         {
             if (WordOrTextTextBox.Text != string.Empty)
             {
-                if (form.Data == null) create_data();
                 WordsAndTextsData.WordOrText type = form_type == AddWordsOrTextFormsType.AddWordForm ? WordsAndTextsData.WordOrText.Word : WordsAndTextsData.WordOrText.Text;
-                if (translation_text_boxes_visible == 1)
-                    form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(), TranslationTextBoxes[0].Text.ToLower());
-                if (translation_text_boxes_visible == 2)
-                    form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
-                        TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower());
-                if (translation_text_boxes_visible == 3)
-                    form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
-                        TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(),
-                        TranslationTextBoxes[2].Text.ToLower());
-                if (translation_text_boxes_visible == 4)
-                    form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
-                        TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(),
-                        TranslationTextBoxes[2].Text.ToLower(), TranslationTextBoxes[3].Text.ToLower());
-                if (translation_text_boxes_visible == 5)
-                    form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
-                        TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(), TranslationTextBoxes[2].Text.ToLower(),
-                        TranslationTextBoxes[3].Text.ToLower(), TranslationTextBoxes[4].Text.ToLower());
+
+                // Проверка, содержат ли поля переводы
+                int count_text_boxes_with_text = 0;
+                for (int i = 0; i < translation_text_boxes_visible; ++i)
+                {
+                    if (TranslationTextBoxes[i].Text != string.Empty) ++count_text_boxes_with_text;
+                }
+
+                if (count_text_boxes_with_text > 0)
+                {
+                    if (form.Data == null) create_data();
+                    if (translation_text_boxes_visible == 1)
+                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(), TranslationTextBoxes[0].Text.ToLower());
+                    if (translation_text_boxes_visible == 2)
+                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
+                            TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower());
+                    if (translation_text_boxes_visible == 3)
+                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
+                            TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(),
+                            TranslationTextBoxes[2].Text.ToLower());
+                    if (translation_text_boxes_visible == 4)
+                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
+                            TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(),
+                            TranslationTextBoxes[2].Text.ToLower(), TranslationTextBoxes[3].Text.ToLower());
+                    if (translation_text_boxes_visible == 5)
+                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
+                            TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(), TranslationTextBoxes[2].Text.ToLower(),
+                            TranslationTextBoxes[3].Text.ToLower(), TranslationTextBoxes[4].Text.ToLower());
+                    else
+                    {
+                        string[] translations = new string[translation_text_boxes_visible];
+                        for (int i = 0; i < translation_text_boxes_visible; ++i) translations[i] = TranslationTextBoxes[i].Text.ToLower();
+                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(), translations);
+                    }
+                    // Очистка полей
+                    ClearButton.PerformClick();
+                    MessageBox.Show(type == WordsAndTextsData.WordOrText.Word ? "Слово добавлено в словарь" : "Текст добавлен в словарь");
+                }
+
                 else
                 {
-                    string[] translations = new string[translation_text_boxes_visible];
-                    for (int i = 0; i < translation_text_boxes_visible; ++i) translations[i] = TranslationTextBoxes[i].Text.ToLower();
-                    form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(), translations);
+                    MessageBox.Show(translation_text_boxes_visible > 1 ? "Поля не содержат перевод" : "Поле не содержит перевод", "Ошибка");
                 }
-                // Очистка полей
-                WordOrTextTextBox.Text = string.Empty;
-                TranslationTextBoxes[0].Text = string.Empty;
-                for (int i = 1; i < translation_text_boxes_visible; ++i)
-                {
-                    TranslationTextBoxes[i].Text = string.Empty;
-                    TranslationTextBoxes[i].Visible = false;
-                }
-                translation_text_boxes_visible = 1;
-                MessageBox.Show(type == WordsAndTextsData.WordOrText.Word ? "Слово добавлено в словарь" : "Текст добавлен в словарь");
             }
         };
         form.Controls.Add(AddWordOrTextButton);
+
+        ClearButton = new Button();
+        ClearButton.Font = button_font;
+        ClearButton.Width = 180;
+        ClearButton.Height = 50;
+        ClearButton.Location = new Point(309, 511);
+        ClearButton.Text = "Очистить";
+        ClearButton.Visible = false;
+        ClearButton.Click += (sender, e) =>
+        {
+            WordOrTextTextBox.Text = string.Empty;
+            TranslationTextBoxes[0].Text = string.Empty;
+            for (int i = 1; i < translation_text_boxes_visible; ++i)
+            {
+                TranslationTextBoxes[i].Text = string.Empty;
+                TranslationTextBoxes[i].Visible = false;
+            }
+            translation_text_boxes_visible = 1;
+
+        };
+        form.Controls.Add(ClearButton);
     }
 
     private void SetVisibleFormElements()
@@ -146,6 +177,7 @@ public sealed class AddWordsOrTextForms : FormStruct
         WordOrTextTextBox.Visible = true;
         TranslationPanel.Visible = true;
         AddWordOrTextButton.Visible = true;
+        ClearButton.Visible = true;
     }
 
     private void HideFormElements()
@@ -155,6 +187,7 @@ public sealed class AddWordsOrTextForms : FormStruct
         WordOrTextTextBox.Visible = false;
         TranslationPanel.Visible = false;
         AddWordOrTextButton.Visible = false;
+        ClearButton.Visible = false;
     }
 
     private void BackToMainForm()

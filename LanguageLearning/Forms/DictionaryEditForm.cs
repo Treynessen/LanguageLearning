@@ -398,6 +398,7 @@ public sealed class DictionaryEditForm : FormStruct
         }
         TranslationTextBoxes[0].Text = string.Empty;
         translation_text_boxes_visible = 1;
+        WordsCheckBox.Checked = false;
         HideFormElements();
     }
 

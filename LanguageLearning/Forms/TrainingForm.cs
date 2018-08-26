@@ -16,12 +16,11 @@ public sealed class TrainingForm : FormStruct
     private Label ResultLabel;
     private Button NextWordOrTextButton;
 
-    private bool first_try_after_entry = true;
     private WordsAndTextsData.WordOrText type;
     private Language language; // Язык слова или предложения в WordOrTextTextBox
     private string right = "Правильно!";
     private string wrong = "Неправильно!";
-    private string if_russian_word_or_text = null;
+    private string if_russian_word_or_text = null; // Если вопрос на русском, то сюда записывается английский перевод
     private int[] words_fill_cells;
     private int[] texts_fill_cells;
 
@@ -29,9 +28,16 @@ public sealed class TrainingForm : FormStruct
     {
         activate_form_button.Click += (sender, e) =>
         {
-            NextWordOrTextButton.Enabled = true;
+            FirstTryAfterEntry(form);
+            NextWordOrTextButton.Enabled = false;
+            CheckButton.Enabled = false;
             SetVisibleFormElements();
-            NextWordOrTextButton.PerformClick();
+            if (words_fill_cells.Length > 0 || texts_fill_cells.Length > 0)
+            {
+                NextWordOrTextButton.Enabled = true;
+                CheckButton.Enabled = true;
+                NextWordOrTextButton.PerformClick();
+            }
         };
         BackToMainFormButton.Click += (sender, e) => BackToMainForm();
 
@@ -82,6 +88,7 @@ public sealed class TrainingForm : FormStruct
                 else
                     word_or_text = language == Language.English ? WordOrTextTextBox.Text : TranslationTextBox.Text.ToLower();
                 int index = form.Data.GetHash(word_or_text, type);
+                // Получение пары слово - переводы
                 if (type == WordsAndTextsData.WordOrText.Word && form.Data.Words[index] != null)
                 {
                     foreach (var _pair in form.Data.Words[index])
@@ -104,6 +111,7 @@ public sealed class TrainingForm : FormStruct
                         }
                     }
                 }
+                // Если пара существует
                 if (pair.Key != null && pair.Key != string.Empty)
                 {
 
@@ -175,29 +183,9 @@ public sealed class TrainingForm : FormStruct
         NextWordOrTextButton.Location = new Point(567, 511);
         NextWordOrTextButton.Click += (sender, e) =>
         {
+            if (words_fill_cells.Length == 0 && texts_fill_cells.Length == 0) return;
+
             if_russian_word_or_text = null;
-            // Если это первое событие, после входа в форму.
-            // Нужно переделать реализацию! Возможно можно как-то связать остальные формы, чтобы они уведомляли эту форму,
-            // когда происходит добавление или удаление элемента из словаря.
-            if (first_try_after_entry)
-            {
-                int words_fill_cells_count = 0;
-                int texts_fill_cells_count = 0;
-                for (int i = 0; i < (form.Data.Words.Length > form.Data.Texts.Length ? form.Data.Words.Length : form.Data.Texts.Length); ++i)
-                {
-                    if (i < form.Data.Words.Length && form.Data.Words[i] != null) ++words_fill_cells_count;
-                    if (i < form.Data.Texts.Length && form.Data.Texts[i] != null) ++texts_fill_cells_count;
-                }
-                words_fill_cells = new int[words_fill_cells_count];
-                texts_fill_cells = new int[texts_fill_cells_count];
-                // Заполнение массивов номерами не пустых ячеек
-                for (int i = 0, w = 0, t = 0; i < (form.Data.Words.Length > form.Data.Texts.Length ? form.Data.Words.Length : form.Data.Texts.Length); ++i)
-                {
-                    if (i < form.Data.Words.Length && form.Data.Words[i] != null) words_fill_cells[w++] = i;
-                    if (i < form.Data.Texts.Length && form.Data.Texts[i] != null) texts_fill_cells[t++] = i;
-                }
-                first_try_after_entry = false;
-            }
 
             ResultLabel.Text = string.Empty;
             TranslationTextBox.Text = string.Empty;
@@ -340,10 +328,32 @@ public sealed class TrainingForm : FormStruct
 
     private void BackToMainForm()
     {
-        first_try_after_entry = true;
         NextWordOrTextButton.Enabled = false;
+        WordOrTextTextBox.Text = string.Empty;
         TranslationTextBox.Text = string.Empty;
         HideFormElements();
+    }
+
+    private void FirstTryAfterEntry(Form1 form)
+    {
+        // Нужно переделать реализацию! Возможно можно как-то связать остальные формы, чтобы они уведомляли эту форму,
+        // когда происходит добавление или удаление элемента из словаря.
+        int words_fill_cells_count = 0;
+        int texts_fill_cells_count = 0;
+        for (int i = 0; i < (form.Data.Words.Length > form.Data.Texts.Length ? form.Data.Words.Length : form.Data.Texts.Length); ++i)
+        {
+            if (i < form.Data.Words.Length && form.Data.Words[i] != null && form.Data.Words[i].Count > 0) ++words_fill_cells_count;
+            if (i < form.Data.Texts.Length && form.Data.Texts[i] != null && form.Data.Texts[i].Count > 0) ++texts_fill_cells_count;
+        }
+        words_fill_cells = new int[words_fill_cells_count];
+        texts_fill_cells = new int[texts_fill_cells_count];
+        if (words_fill_cells_count == 0 && texts_fill_cells_count == 0) return;
+        // Заполнение массивов номерами не пустых ячеек
+        for (int i = 0, w = 0, t = 0; i < (form.Data.Words.Length > form.Data.Texts.Length ? form.Data.Words.Length : form.Data.Texts.Length); ++i)
+        {
+            if (i < form.Data.Words.Length && form.Data.Words[i] != null && form.Data.Words[i].Count > 0) words_fill_cells[w++] = i;
+            if (i < form.Data.Texts.Length && form.Data.Texts[i] != null && form.Data.Texts[i].Count > 0) texts_fill_cells[t++] = i;
+        }
     }
 
     private enum Language
