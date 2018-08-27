@@ -23,8 +23,8 @@ public sealed class TrainingForm : FormStruct
     private string if_russian_word_or_text = null; // Если вопрос на русском, то сюда записывается английский перевод
     private int[] words_fill_cells;
     private int[] texts_fill_cells;
-    int words_was_count = 0;
-    int texts_was_count = 0;
+    int words_was_max_count = 0;
+    int texts_was_max_count = 0;
     LinkedList<string> words_was;
     LinkedList<string> texts_was;
 
@@ -243,10 +243,10 @@ public sealed class TrainingForm : FormStruct
                         if_russian_word_or_text = form.Data.Words[index].ElementAt(list_index).Key;
                     }
 
-                    if (words_was_count > 0)
+                    if (words_was_max_count > 0)
                     {
                         // Если не заполнен, то продолжаем заполнение
-                        if (words_was.Count < words_was_count) words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
+                        if (words_was.Count < words_was_max_count) words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
                         // Иначе удаляем первое значение из очереди и добавляем слово в конец списка
                         else
                         {
@@ -294,10 +294,10 @@ public sealed class TrainingForm : FormStruct
                         if_russian_word_or_text = form.Data.Texts[index].ElementAt(list_index).Key;
                     }
 
-                    if (texts_was_count > 0)
+                    if (texts_was_max_count > 0)
                     {
                         // Если не заполнен, то продолжаем заполнение
-                        if (texts_was.Count < texts_was_count) texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
+                        if (texts_was.Count < texts_was_max_count) texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
                         // Иначе удаляем первое значение из очереди и добавляем текст в конец списка
                         else
                         {
@@ -414,8 +414,8 @@ public sealed class TrainingForm : FormStruct
                 if (tn != null) texts_fill_cells[t++] = tn.Value;
             }
         }
-        words_was_count = words_fill_cells_nums.Count / 2;
-        texts_was_count = texts_fill_cells_nums.Count / 2;
+        words_was_max_count = words_fill_cells_nums.Count / 2;
+        texts_was_max_count = texts_fill_cells_nums.Count / 2;
         words_was = new LinkedList<string>();
         texts_was = new LinkedList<string>();
 
