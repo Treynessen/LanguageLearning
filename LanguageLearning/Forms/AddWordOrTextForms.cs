@@ -145,6 +145,8 @@ public sealed class AddWordsOrTextForms : FormStruct
                     MessageBox.Show(translation_text_boxes_visible > 1 ? "Поля не содержат перевод" : "Поле не содержит перевод", "Ошибка");
                 }
             }
+            else MessageBox.Show(form_type == AddWordsOrTextFormsType.AddWordForm?"Поле для ввода слова не заполнено":
+                "Поле для ввода предложения не заполнено", "Ошибка");
         };
         form.Controls.Add(AddWordOrTextButton);
 

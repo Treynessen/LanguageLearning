@@ -20,7 +20,9 @@ public sealed class TrainingForm : FormStruct
     private Language language; // Язык слова или предложения в WordOrTextTextBox
     private string right = "Правильно!";
     private string wrong = "Неправильно!";
-    private string if_russian_word_or_text = null; // Если вопрос на русском, то сюда записывается английский перевод
+    private string if_russian_word_or_text = null;  // Если вопрос на русском, то сюда записывается английский перевод. 
+                                                    // Если дан неправильный ответ, то слово из этого поля записывается в 
+                                                    // массив Incomprehensible
     private int[] words_fill_cells;
     private int[] texts_fill_cells;
     int words_was_max_count = 0;

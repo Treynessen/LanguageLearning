@@ -368,6 +368,7 @@ public sealed class DictionaryEditForm : FormStruct
                 }
                 MessageBox.Show("Изменения сохранены");
             }
+            else MessageBox.Show(WordsCheckBox.Checked ? "Не выбрано слово" : "Не выбрано предложение", "Ошибка");
         };
         form.Controls.Add(SaveChangesButton);
     }
