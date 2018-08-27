@@ -18,6 +18,9 @@ public sealed class DictionaryEditForm : FormStruct
     private List<TextBox> TranslationTextBoxes;
     private List<Button> DeleteTranslationButton;
 
+    private string word_label = "Слова";
+    private string text_label = "Предложения";
+
     private List<string> words;
     private List<string> texts;
 
@@ -36,7 +39,7 @@ public sealed class DictionaryEditForm : FormStruct
         BackToMainFormButton.Click += (sender, e) => BackToMainForm();
 
         WordsOrTextsLabel = new Label();
-        WordsOrTextsLabel.Text = "Слова";
+        WordsOrTextsLabel.Text = word_label;
         WordsOrTextsLabel.Font = text_font;
         WordsOrTextsLabel.Location = new Point(161, 132);
         WordsOrTextsLabel.Width = 200;
@@ -44,7 +47,7 @@ public sealed class DictionaryEditForm : FormStruct
         form.Controls.Add(WordsOrTextsLabel);
 
         WordsCheckBox = new CheckBox();
-        WordsCheckBox.Text = "Слова";
+        WordsCheckBox.Text = word_label;
         WordsCheckBox.Font = new Font("Consolas", 12, FontStyle.Regular);
         WordsCheckBox.Location = new Point(515, 132);
         WordsCheckBox.Checked = false;
@@ -56,7 +59,7 @@ public sealed class DictionaryEditForm : FormStruct
                 WordsCheckBox.Enabled = false;
                 TextsCheckBox.Enabled = true;
                 TextsCheckBox.Checked = false;
-                WordsOrTextsLabel.Text = "Слова";
+                WordsOrTextsLabel.Text = word_label;
                 WordsOrTextsComboBox.Items.Clear();
                 foreach (var word in words)
                 {
@@ -77,7 +80,7 @@ public sealed class DictionaryEditForm : FormStruct
         form.Controls.Add(WordsCheckBox);
 
         TextsCheckBox = new CheckBox();
-        TextsCheckBox.Text = "Предложения";
+        TextsCheckBox.Text = text_label;
         TextsCheckBox.Font = new Font("Consolas", 12, FontStyle.Regular);
         TextsCheckBox.Location = new Point(598, 132);
         TextsCheckBox.Checked = false;
@@ -89,7 +92,7 @@ public sealed class DictionaryEditForm : FormStruct
                 TextsCheckBox.Enabled = false;
                 WordsCheckBox.Enabled = true;
                 WordsCheckBox.Checked = false;
-                WordsOrTextsLabel.Text = "Предложения";
+                WordsOrTextsLabel.Text = text_label;
                 WordsOrTextsComboBox.Items.Clear();
                 foreach (var text in texts)
                 {

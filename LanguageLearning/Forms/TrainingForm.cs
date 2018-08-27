@@ -23,6 +23,10 @@ public sealed class TrainingForm : FormStruct
     private string if_russian_word_or_text = null;  // Если вопрос на русском, то сюда записывается английский перевод. 
                                                     // Если дан неправильный ответ, то слово из этого поля записывается в 
                                                     // массив Incomprehensible
+
+    private string word_label = "Слово";
+    private string text_label = "Предложение";
+
     private int[] words_fill_cells;
     private int[] texts_fill_cells;
     int words_was_max_count = 0;
@@ -48,8 +52,9 @@ public sealed class TrainingForm : FormStruct
         BackToMainFormButton.Click += (sender, e) => BackToMainForm();
 
         WordOrTextLabel = new Label();
-        WordOrTextLabel.Text = "Слово";
+        WordOrTextLabel.Text = word_label;
         WordOrTextLabel.Font = text_font;
+        WordOrTextLabel.Width = 200;
         WordOrTextLabel.Location = new Point(161, 132);
         WordOrTextLabel.Visible = false;
         form.Controls.Add(WordOrTextLabel);
@@ -201,7 +206,7 @@ public sealed class TrainingForm : FormStruct
             if (words_fill_cells.Length != 0 || texts_fill_cells.Length != 0 || form.Incomprehensible != null)
             {
                 int rand_num = -1;
-                if (words_fill_cells.Length != 0 && texts_fill_cells.Length != 0 && form.Incomprehensible == null) rand_num = rand.Next(0, 2);
+                if (words_fill_cells.Length != 0 && texts_fill_cells.Length != 0 && (form.Incomprehensible == null || form.Incomprehensible.Count < 1)) rand_num = rand.Next(0, 2);
                 else if (words_fill_cells.Length != 0 && texts_fill_cells.Length != 0 && form.Incomprehensible != null && form.Incomprehensible.Count > 0) rand_num = rand.Next(0, 4); // повышенный шанс
                 else if (form.Incomprehensible != null && form.Incomprehensible.Count > 0) rand_num = 2;
                 else if (words_fill_cells.Length != 0) rand_num = 0;
@@ -209,6 +214,7 @@ public sealed class TrainingForm : FormStruct
                 // Выбор слова
                 if (rand_num == 0)
                 {
+                    WordOrTextLabel.Text = word_label;
                     type = WordsAndTextsData.WordOrText.Word;
                     int index = -1;
                     do
@@ -218,7 +224,7 @@ public sealed class TrainingForm : FormStruct
                     } while (form.Data.Words[index] == null || form.Data.Words[index].Count == 0);
 
                     int list_index = rand.Next(0, form.Data.Words[index].Count);
-                    // Проверка, было ли это слово
+                    // Проверка, было ли это слово ранее
                     if (words_was.Count > 0)
                     {
                         foreach (var str in words_was)
@@ -260,6 +266,7 @@ public sealed class TrainingForm : FormStruct
                 // Выбор предложения
                 else if (rand_num == 1)
                 {
+                    WordOrTextLabel.Text = text_label;
                     type = WordsAndTextsData.WordOrText.Text;
                     int index = -1;
                     do
@@ -269,7 +276,7 @@ public sealed class TrainingForm : FormStruct
                     } while (form.Data.Texts[index] == null || form.Data.Texts[index].Count == 0);
 
                     int list_index = rand.Next(0, form.Data.Texts[index].Count);
-                    // Проверка, был ли этот текст
+                    // Проверка, был ли этот текст ранее
                     if (texts_was.Count > 0)
                     {
                         foreach (var str in texts_was)
@@ -328,6 +335,7 @@ public sealed class TrainingForm : FormStruct
                         KeyValuePair<string, LinkedListWithTranslations> pair = new KeyValuePair<string, LinkedListWithTranslations>();
                         if (type == WordsAndTextsData.WordOrText.Word)
                         {
+                            WordOrTextLabel.Text = word_label;
                             foreach (var _pair in form.Data.Words[index])
                             {
                                 if (if_russian_word_or_text == _pair.Key)
@@ -339,6 +347,7 @@ public sealed class TrainingForm : FormStruct
                         }
                         else
                         {
+                            WordOrTextLabel.Text = text_label;
                             foreach (var _pair in form.Data.Texts[index])
                             {
                                 if (if_russian_word_or_text == _pair.Key)

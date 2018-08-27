@@ -23,8 +23,9 @@ public sealed class AddWordsOrTextForms : FormStruct
 
         WordOrTextLabel = new Label();
         if (form_type == AddWordsOrTextFormsType.AddWordForm) WordOrTextLabel.Text = "Слово";
-        else if (form_type == AddWordsOrTextFormsType.AddTextForm) WordOrTextLabel.Text = "Текст";
+        else if (form_type == AddWordsOrTextFormsType.AddTextForm) WordOrTextLabel.Text = "Предложение";
         WordOrTextLabel.Font = text_font;
+        WordOrTextLabel.Width = 200;
         WordOrTextLabel.Location = new Point(161, 132);
         WordOrTextLabel.Visible = false;
         form.Controls.Add(WordOrTextLabel);
