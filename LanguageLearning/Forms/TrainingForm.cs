@@ -243,7 +243,7 @@ public sealed class TrainingForm : FormStruct
                         if_russian_word_or_text = form.Data.Words[index].ElementAt(list_index).Key;
                     }
 
-                    if (words_was.Count > 0)
+                    if (words_was_count > 0)
                     {
                         // Если не заполнен, то продолжаем заполнение
                         if (words_was.Count < words_was_count) words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
@@ -294,7 +294,7 @@ public sealed class TrainingForm : FormStruct
                         if_russian_word_or_text = form.Data.Texts[index].ElementAt(list_index).Key;
                     }
 
-                    if (texts_was.Count > 0)
+                    if (texts_was_count > 0)
                     {
                         // Если не заполнен, то продолжаем заполнение
                         if (texts_was.Count < texts_was_count) texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
@@ -390,24 +390,32 @@ public sealed class TrainingForm : FormStruct
     {
         // Нужно переделать реализацию! Возможно можно как-то связать остальные формы, чтобы они уведомляли эту форму,
         // когда происходит добавление или удаление элемента из словаря.
-        int words_fill_cells_count = 0;
-        int texts_fill_cells_count = 0;
+        LinkedList<int> words_fill_cells_nums = new LinkedList<int>();
+        LinkedList<int> texts_fill_cells_nums = new LinkedList<int>();
         for (int i = 0; i < (form.Data.Words.Length > form.Data.Texts.Length ? form.Data.Words.Length : form.Data.Texts.Length); ++i)
         {
-            if (i < form.Data.Words.Length && form.Data.Words[i] != null && form.Data.Words[i].Count > 0) ++words_fill_cells_count;
-            if (i < form.Data.Texts.Length && form.Data.Texts[i] != null && form.Data.Texts[i].Count > 0) ++texts_fill_cells_count;
+            if (i < form.Data.Words.Length && form.Data.Words[i] != null && form.Data.Words[i].Count > 0) words_fill_cells_nums.AddLast(i);
+            if (i < form.Data.Texts.Length && form.Data.Texts[i] != null && form.Data.Texts[i].Count > 0) texts_fill_cells_nums.AddLast(i);
         }
-        words_fill_cells = new int[words_fill_cells_count];
-        texts_fill_cells = new int[texts_fill_cells_count];
-        if (words_fill_cells_count == 0 && texts_fill_cells_count == 0) return;
+        words_fill_cells = new int[words_fill_cells_nums.Count];
+        texts_fill_cells = new int[texts_fill_cells_nums.Count];
+        if (words_fill_cells_nums.Count == 0 && texts_fill_cells_nums.Count == 0) return;
         // Заполнение массивов номерами не пустых ячеек
-        for (int i = 0, w = 0, t = 0; i < (form.Data.Words.Length > form.Data.Texts.Length ? form.Data.Words.Length : form.Data.Texts.Length); ++i)
         {
-            if (i < form.Data.Words.Length && form.Data.Words[i] != null && form.Data.Words[i].Count > 0) words_fill_cells[w++] = i;
-            if (i < form.Data.Texts.Length && form.Data.Texts[i] != null && form.Data.Texts[i].Count > 0) texts_fill_cells[t++] = i;
+            // wn - words_node
+            // tn - texts_node
+            // w - переменная для итерирования по массиву с адресами ячеек со словами
+            // t - переменная для итерирования по массиву с адресами ячеек с текстом
+            LinkedListNode<int> wn = words_fill_cells_nums.First, tn = texts_fill_cells_nums.First;
+            for (int w = 0, t = 0; (words_fill_cells_nums.Count > texts_fill_cells_nums.Count ? wn : tn) != null;
+                 wn = wn != null ? wn.Next : null, tn = tn != null ? tn.Next : null)
+            {
+                if (wn != null) words_fill_cells[w++] = wn.Value;
+                if (tn != null) texts_fill_cells[t++] = tn.Value;
+            }
         }
-        words_was_count = words_fill_cells_count / 2;
-        texts_was_count = texts_fill_cells_count / 2;
+        words_was_count = words_fill_cells_nums.Count / 2;
+        texts_was_count = texts_fill_cells_nums.Count / 2;
         words_was = new LinkedList<string>();
         texts_was = new LinkedList<string>();
 

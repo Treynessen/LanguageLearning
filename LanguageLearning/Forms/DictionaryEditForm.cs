@@ -189,13 +189,16 @@ public sealed class DictionaryEditForm : FormStruct
                     }
                 }
 
-                // Если слово было добавлено в Incomprehensible, то удаляем его 
-                foreach (var pair in form.Incomprehensible)
+                // Если слово или предложение было добавлено в Incomprehensible, то удаляем его 
+                if (form.Incomprehensible != null)
                 {
-                    if (pair.Key == WordsOrTextsComboBox.Text)
+                    foreach (var pair in form.Incomprehensible)
                     {
-                        form.Incomprehensible.Remove(pair);
-                        break;
+                        if (pair.Key == WordsOrTextsComboBox.Text)
+                        {
+                            form.Incomprehensible.Remove(pair);
+                            break;
+                        }
                     }
                 }
 
