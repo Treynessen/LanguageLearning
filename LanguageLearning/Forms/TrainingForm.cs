@@ -351,6 +351,7 @@ public sealed class TrainingForm : FormStruct
         NextWordOrTextButton.Enabled = false;
         WordOrTextTextBox.Text = string.Empty;
         TranslationTextBox.Text = string.Empty;
+        ResultLabel.Text = string.Empty;
         HideFormElements();
     }
 
