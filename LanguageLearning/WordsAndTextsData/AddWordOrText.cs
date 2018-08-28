@@ -3,7 +3,9 @@ using LinkedListWithTranslations = System.Collections.Generic.LinkedList<string>
 
 public partial class WordsAndTextsData
 {
-    public void AddWordOrText(WordOrText type, string word_or_text, string translation)
+    // Возвращает true, если word_or_text не было в словаре, иначе false
+
+    public bool AddWordOrText(WordOrText type, string word_or_text, string translation)
     {
         if (word_or_text != null && translation != null && word_or_text != string.Empty && translation != string.Empty)
         {
@@ -14,7 +16,7 @@ public partial class WordsAndTextsData
                 bool have = false;
                 foreach (var word_or_text_translation in word_or_text_translations)
                 {
-                    if (word_or_text_translation == translation)
+                    if (word_or_text_translation.Equals(translation, System.StringComparison.CurrentCultureIgnoreCase))
                     {
                         have = true;
                         break;
@@ -37,11 +39,13 @@ public partial class WordsAndTextsData
                     if (Texts[index] == null) Texts[index] = new LinkedList<KeyValuePair<string, LinkedListWithTranslations>>();
                     Texts[index].AddLast(pair);
                 }
+                return true;
             }
         }
+        return false;
     }
 
-    public void AddWordOrText(WordOrText type, string word_or_text, string translation_1, string translation_2)
+    public bool AddWordOrText(WordOrText type, string word_or_text, string translation_1, string translation_2)
     {
         if (word_or_text != null && translation_1 != null && translation_2 != null && word_or_text != string.Empty
             && (translation_1 != string.Empty || translation_2 != string.Empty))
@@ -54,8 +58,8 @@ public partial class WordsAndTextsData
                 bool have_2 = false;
                 foreach (var word_or_text_translation in word_or_text_translations)
                 {
-                    if (word_or_text_translation == translation_1) have_1 = true;
-                    if (word_or_text_translation == translation_2) have_2 = true;
+                    if (word_or_text_translation.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)) have_1 = true;
+                    if (word_or_text_translation.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase)) have_2 = true;
                     if (have_1 && have_2) break;
                 }
                 if (!have_1 && translation_1 != string.Empty) word_or_text_translations.AddLast(translation_1);
@@ -65,7 +69,11 @@ public partial class WordsAndTextsData
             {
                 LinkedListWithTranslations translations_list = new LinkedListWithTranslations();
                 if (translation_1 != string.Empty) translations_list.AddLast(translation_1);
-                if (translation_2 != string.Empty) translations_list.AddLast(translation_2);
+
+                if (translation_2 != string.Empty)
+                    if (!translation_2.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_2);
+
                 KeyValuePair<string, LinkedListWithTranslations> pair = new KeyValuePair<string, LinkedListWithTranslations>(word_or_text, translations_list);
                 if (type == WordOrText.Word)
                 {
@@ -77,11 +85,13 @@ public partial class WordsAndTextsData
                     if (Texts[index] == null) Texts[index] = new LinkedList<KeyValuePair<string, LinkedListWithTranslations>>();
                     Texts[index].AddLast(pair);
                 }
+                return true;
             }
         }
+        return false;
     }
 
-    public void AddWordOrText(WordOrText type, string word_or_text, string translation_1, string translation_2, string translation_3)
+    public bool AddWordOrText(WordOrText type, string word_or_text, string translation_1, string translation_2, string translation_3)
     {
         if (word_or_text != null && translation_1 != null && translation_2 != null && translation_3 != null
             && word_or_text != string.Empty && (translation_1 != string.Empty || translation_2 != string.Empty
@@ -96,9 +106,9 @@ public partial class WordsAndTextsData
                 bool have_3 = false;
                 foreach (var word_or_text_translation in word_or_text_translations)
                 {
-                    if (word_or_text_translation == translation_1) have_1 = true;
-                    if (word_or_text_translation == translation_2) have_2 = true;
-                    if (word_or_text_translation == translation_3) have_3 = true;
+                    if (word_or_text_translation.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)) have_1 = true;
+                    if (word_or_text_translation.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase)) have_2 = true;
+                    if (word_or_text_translation.Equals(translation_3, System.StringComparison.CurrentCultureIgnoreCase)) have_3 = true;
                     if (have_1 && have_2 && have_3) break;
                 }
                 if (!have_1 && translation_1 != string.Empty) word_or_text_translations.AddLast(translation_1);
@@ -109,8 +119,16 @@ public partial class WordsAndTextsData
             {
                 LinkedListWithTranslations translations_list = new LinkedListWithTranslations();
                 if (translation_1 != string.Empty) translations_list.AddLast(translation_1);
-                if (translation_2 != string.Empty) translations_list.AddLast(translation_2);
-                if (translation_3 != string.Empty) translations_list.AddLast(translation_3);
+
+                if (translation_2 != string.Empty)
+                    if (!translation_2.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_2);
+
+                if (translation_3 != string.Empty)
+                    if (!translation_3.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_3.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_3);
+
                 KeyValuePair<string, LinkedListWithTranslations> pair = new KeyValuePair<string, LinkedListWithTranslations>(word_or_text, translations_list);
                 if (type == WordOrText.Word)
                 {
@@ -122,11 +140,13 @@ public partial class WordsAndTextsData
                     if (Texts[index] == null) Texts[index] = new LinkedList<KeyValuePair<string, LinkedListWithTranslations>>();
                     Texts[index].AddLast(pair);
                 }
+                return true;
             }
         }
+        return false;
     }
 
-    public void AddWordOrText(WordOrText type, string word_or_text, string translation_1, string translation_2, string translation_3, string translation_4)
+    public bool AddWordOrText(WordOrText type, string word_or_text, string translation_1, string translation_2, string translation_3, string translation_4)
     {
         if (word_or_text != null && translation_1 != null && translation_2 != null && translation_3 != null
             && translation_4 != null && word_or_text != string.Empty && (translation_1 != string.Empty
@@ -142,10 +162,10 @@ public partial class WordsAndTextsData
                 bool have_4 = false;
                 foreach (var word_or_text_translation in word_or_text_translations)
                 {
-                    if (word_or_text_translation == translation_1) have_1 = true;
-                    if (word_or_text_translation == translation_2) have_2 = true;
-                    if (word_or_text_translation == translation_3) have_3 = true;
-                    if (word_or_text_translation == translation_4) have_4 = true;
+                    if (word_or_text_translation.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)) have_1 = true;
+                    if (word_or_text_translation.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase)) have_2 = true;
+                    if (word_or_text_translation.Equals(translation_3, System.StringComparison.CurrentCultureIgnoreCase)) have_3 = true;
+                    if (word_or_text_translation.Equals(translation_4, System.StringComparison.CurrentCultureIgnoreCase)) have_4 = true;
                     if (have_1 && have_2 && have_3 && have_4) break;
                 }
                 if (!have_1 && translation_1 != string.Empty) word_or_text_translations.AddLast(translation_1);
@@ -157,9 +177,22 @@ public partial class WordsAndTextsData
             {
                 LinkedListWithTranslations translations_list = new LinkedListWithTranslations();
                 if (translation_1 != string.Empty) translations_list.AddLast(translation_1);
-                if (translation_2 != string.Empty) translations_list.AddLast(translation_2);
-                if (translation_3 != string.Empty) translations_list.AddLast(translation_3);
-                if (translation_4 != string.Empty) translations_list.AddLast(translation_4);
+
+                if (translation_2 != string.Empty)
+                    if (!translation_2.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_2);
+
+                if (translation_3 != string.Empty)
+                    if (!translation_3.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_3.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_3);
+
+                if (translation_4 != string.Empty)
+                    if (!translation_4.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_4.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_4.Equals(translation_3, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_4);
+
                 KeyValuePair<string, LinkedListWithTranslations> pair = new KeyValuePair<string, LinkedListWithTranslations>(word_or_text, translations_list);
                 if (type == WordOrText.Word)
                 {
@@ -171,11 +204,13 @@ public partial class WordsAndTextsData
                     if (Texts[index] == null) Texts[index] = new LinkedList<KeyValuePair<string, LinkedListWithTranslations>>();
                     Texts[index].AddLast(pair);
                 }
+                return true;
             }
         }
+        return false;
     }
 
-    public void AddWordOrText(WordOrText type, string word_or_text, string translation_1, string translation_2, string translation_3, string translation_4, string translation_5)
+    public bool AddWordOrText(WordOrText type, string word_or_text, string translation_1, string translation_2, string translation_3, string translation_4, string translation_5)
     {
         if (word_or_text != null && translation_1 != null && translation_2 != null && translation_3 != null
             && translation_4 != null && translation_5 != null && word_or_text != string.Empty
@@ -193,11 +228,11 @@ public partial class WordsAndTextsData
                 bool have_5 = false;
                 foreach (var word_or_text_translation in word_or_text_translations)
                 {
-                    if (word_or_text_translation == translation_1) have_1 = true;
-                    if (word_or_text_translation == translation_2) have_2 = true;
-                    if (word_or_text_translation == translation_3) have_3 = true;
-                    if (word_or_text_translation == translation_4) have_4 = true;
-                    if (word_or_text_translation == translation_5) have_5 = true;
+                    if (word_or_text_translation.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)) have_1 = true;
+                    if (word_or_text_translation.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase)) have_2 = true;
+                    if (word_or_text_translation.Equals(translation_3, System.StringComparison.CurrentCultureIgnoreCase)) have_3 = true;
+                    if (word_or_text_translation.Equals(translation_4, System.StringComparison.CurrentCultureIgnoreCase)) have_4 = true;
+                    if (word_or_text_translation.Equals(translation_5, System.StringComparison.CurrentCultureIgnoreCase)) have_5 = true;
                     if (have_1 && have_2 && have_3 && have_4 && have_5) break;
                 }
                 if (!have_1 && translation_1 != string.Empty) word_or_text_translations.AddLast(translation_1);
@@ -210,10 +245,29 @@ public partial class WordsAndTextsData
             {
                 LinkedListWithTranslations translations_list = new LinkedListWithTranslations();
                 if (translation_1 != string.Empty) translations_list.AddLast(translation_1);
-                if (translation_2 != string.Empty) translations_list.AddLast(translation_2);
-                if (translation_3 != string.Empty) translations_list.AddLast(translation_3);
-                if (translation_4 != string.Empty) translations_list.AddLast(translation_4);
-                if (translation_5 != string.Empty) translations_list.AddLast(translation_5);
+
+                if (translation_2 != string.Empty)
+                    if (!translation_2.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_2);
+
+                if (translation_3 != string.Empty)
+                    if (!translation_3.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_3.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_3);
+
+                if (translation_4 != string.Empty)
+                    if (!translation_4.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_4.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_4.Equals(translation_3, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_4);
+
+                if (translation_5 != string.Empty)
+                    if (!translation_5.Equals(translation_1, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_5.Equals(translation_2, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_5.Equals(translation_3, System.StringComparison.CurrentCultureIgnoreCase)
+                        && !translation_5.Equals(translation_4, System.StringComparison.CurrentCultureIgnoreCase))
+                        translations_list.AddLast(translation_5);
+
                 KeyValuePair<string, LinkedListWithTranslations> pair = new KeyValuePair<string, LinkedListWithTranslations>(word_or_text, translations_list);
                 if (type == WordOrText.Word)
                 {
@@ -225,11 +279,13 @@ public partial class WordsAndTextsData
                     if (Texts[index] == null) Texts[index] = new LinkedList<KeyValuePair<string, LinkedListWithTranslations>>();
                     Texts[index].AddLast(pair);
                 }
+                return true;
             }
         }
+        return false;
     }
 
-    public void AddWordOrText(WordOrText type, string word_or_text, string[] translations)
+    public bool AddWordOrText(WordOrText type, string word_or_text, string[] translations)
     {
         if (word_or_text != null && translations != null && word_or_text != string.Empty)
         {
@@ -241,7 +297,7 @@ public partial class WordsAndTextsData
                 foreach (var word_or_text_translation in word_or_text_translations)
                 {
                     for (int i = 0; i < translations.Length; ++i)
-                        if (translations[i] == word_or_text_translation) have[i] = true;
+                        if (translations[i].Equals(word_or_text_translation, System.StringComparison.CurrentCultureIgnoreCase)) have[i] = true;
                 }
                 for (int i = 0; i < translations.Length; ++i)
                     if (!have[i] && translations[i] != null && translations[i] != string.Empty) word_or_text_translations.AddLast(translations[i]);
@@ -250,7 +306,21 @@ public partial class WordsAndTextsData
             {
                 LinkedListWithTranslations translations_list = new LinkedListWithTranslations();
                 for (int i = 0; i < translations.Length; ++i)
-                    if (translations[i] != null && translations[i] != string.Empty) translations_list.AddLast(translations[i]);
+                {
+                    if (translations[i] != null && translations[i] != string.Empty)
+                    {
+                        bool have = false;
+                        for (int j = 0; j < i; ++j)
+                        {
+                            if (translations[i].Equals(translations[i], System.StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                have = true;
+                                break;
+                            }
+                        }
+                        if (!have) translations_list.AddLast(translations[i]);
+                    }
+                }
                 KeyValuePair<string, LinkedListWithTranslations> pair = new KeyValuePair<string, LinkedListWithTranslations>(word_or_text, translations_list);
                 if (type == WordOrText.Word)
                 {
@@ -262,7 +332,9 @@ public partial class WordsAndTextsData
                     if (Texts[index] == null) Texts[index] = new LinkedList<KeyValuePair<string, LinkedListWithTranslations>>();
                     Texts[index].AddLast(pair);
                 }
+                return true;
             }
         }
+        return false;
     }
 }

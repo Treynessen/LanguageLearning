@@ -14,6 +14,13 @@ public sealed class AddWordsOrTextForms : FormStruct
     private Button AddWordOrTextButton;
     private Button ClearButton;
 
+    public event EventHandler<Changes> AddWordOrTextEvent; // Добавление слова или текста
+
+    private static string word_added_to_dictionary = "Слово добавлено в словарь";
+    private static string text_added_to_dictionary = "Предложение добавлено в словарь";
+    private static string field_dont_have_word = "Поле для ввода слова не заполнено";
+    private static string field_dont_have_text = "Поле для ввода предложения не заполнено";
+
     int translation_text_boxes_visible = 1;
 
     public AddWordsOrTextForms(Form1 form, Button activate_form_button, Action create_data, AddWordsOrTextFormsType form_type) : base(form)
@@ -22,8 +29,8 @@ public sealed class AddWordsOrTextForms : FormStruct
         BackToMainFormButton.Click += (sender, e) => BackToMainForm();
 
         WordOrTextLabel = new Label();
-        if (form_type == AddWordsOrTextFormsType.AddWordForm) WordOrTextLabel.Text = "Слово";
-        else if (form_type == AddWordsOrTextFormsType.AddTextForm) WordOrTextLabel.Text = "Предложение";
+        if (form_type == AddWordsOrTextFormsType.AddWordForm) WordOrTextLabel.Text = word_label;
+        else if (form_type == AddWordsOrTextFormsType.AddTextForm) WordOrTextLabel.Text = text_label;
         WordOrTextLabel.Font = text_font;
         WordOrTextLabel.Width = 200;
         WordOrTextLabel.Location = new Point(161, 132);
@@ -48,7 +55,7 @@ public sealed class AddWordsOrTextForms : FormStruct
         form.Controls.Add(TranslationPanel);
 
         TranslationLabel = new Label();
-        TranslationLabel.Text = "Перевод";
+        TranslationLabel.Text = translation_label;
         TranslationLabel.Font = text_font;
         TranslationLabel.Location = new Point(161, 0);
         TranslationPanel.Controls.Add(TranslationLabel);
@@ -110,44 +117,49 @@ public sealed class AddWordsOrTextForms : FormStruct
                     if (TranslationTextBoxes[i].Text != string.Empty) ++count_text_boxes_with_text;
                 }
 
+                bool was_added_new_word_or_text = false;
+
                 if (count_text_boxes_with_text > 0)
                 {
                     if (form.Data == null) create_data();
                     if (translation_text_boxes_visible == 1)
-                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(), TranslationTextBoxes[0].Text.ToLower());
-                    if (translation_text_boxes_visible == 2)
-                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
-                            TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower());
-                    if (translation_text_boxes_visible == 3)
-                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
-                            TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(),
-                            TranslationTextBoxes[2].Text.ToLower());
-                    if (translation_text_boxes_visible == 4)
-                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
-                            TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(),
-                            TranslationTextBoxes[2].Text.ToLower(), TranslationTextBoxes[3].Text.ToLower());
-                    if (translation_text_boxes_visible == 5)
-                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(),
-                            TranslationTextBoxes[0].Text.ToLower(), TranslationTextBoxes[1].Text.ToLower(), TranslationTextBoxes[2].Text.ToLower(),
-                            TranslationTextBoxes[3].Text.ToLower(), TranslationTextBoxes[4].Text.ToLower());
+                        was_added_new_word_or_text = form.Data.AddWordOrText(type, WordOrTextTextBox.Text, TranslationTextBoxes[0].Text);
+                    else if (translation_text_boxes_visible == 2)
+                        was_added_new_word_or_text = form.Data.AddWordOrText(type, WordOrTextTextBox.Text,
+                            TranslationTextBoxes[0].Text, TranslationTextBoxes[1].Text);
+                    else if (translation_text_boxes_visible == 3)
+                        was_added_new_word_or_text = form.Data.AddWordOrText(type, WordOrTextTextBox.Text,
+                            TranslationTextBoxes[0].Text, TranslationTextBoxes[1].Text,
+                            TranslationTextBoxes[2].Text);
+                    else if (translation_text_boxes_visible == 4)
+                        was_added_new_word_or_text = form.Data.AddWordOrText(type, WordOrTextTextBox.Text,
+                            TranslationTextBoxes[0].Text, TranslationTextBoxes[1].Text,
+                            TranslationTextBoxes[2].Text, TranslationTextBoxes[3].Text);
+                    else if (translation_text_boxes_visible == 5)
+                        was_added_new_word_or_text = form.Data.AddWordOrText(type, WordOrTextTextBox.Text,
+                            TranslationTextBoxes[0].Text, TranslationTextBoxes[1].Text, TranslationTextBoxes[2].Text,
+                            TranslationTextBoxes[3].Text, TranslationTextBoxes[4].Text);
                     else
                     {
                         string[] translations = new string[translation_text_boxes_visible];
-                        for (int i = 0; i < translation_text_boxes_visible; ++i) translations[i] = TranslationTextBoxes[i].Text.ToLower();
-                        form.Data.AddWordOrText(type, WordOrTextTextBox.Text.ToLower(), translations);
+                        for (int i = 0; i < translation_text_boxes_visible; ++i) translations[i] = TranslationTextBoxes[i].Text;
+                        was_added_new_word_or_text = form.Data.AddWordOrText(type, WordOrTextTextBox.Text, translations);
                     }
+
+                    if (was_added_new_word_or_text)
+                        AddWordOrTextEvent(this, new Changes(WordOrTextTextBox.Text, type == WordsAndTextsData.WordOrText.Word ? TypeChanges.WordAdded : TypeChanges.TextAdded));
+
                     // Очистка полей
                     ClearButton.PerformClick();
-                    MessageBox.Show(type == WordsAndTextsData.WordOrText.Word ? "Слово добавлено в словарь" : "Текст добавлен в словарь");
+                    MessageBox.Show(type == WordsAndTextsData.WordOrText.Word ? word_added_to_dictionary : text_added_to_dictionary);
                 }
 
                 else
                 {
-                    MessageBox.Show(translation_text_boxes_visible > 1 ? "Поля не содержат перевод" : "Поле не содержит перевод", "Ошибка");
+                    MessageBox.Show(translation_text_boxes_visible > 1 ? fields_dont_have_translation : field_dont_have_translation, error);
                 }
             }
-            else MessageBox.Show(form_type == AddWordsOrTextFormsType.AddWordForm?"Поле для ввода слова не заполнено":
-                "Поле для ввода предложения не заполнено", "Ошибка");
+            else MessageBox.Show(form_type == AddWordsOrTextFormsType.AddWordForm ? field_dont_have_word : field_dont_have_text, error);
         };
         form.Controls.Add(AddWordOrTextButton);
 
@@ -199,6 +211,7 @@ public sealed class AddWordsOrTextForms : FormStruct
         TranslationTextBoxes[0].Text = string.Empty;
         for (int i = 1; i < TranslationTextBoxes.Count; ++i)
         {
+            if (TranslationTextBoxes[i].Visible == false) break;
             TranslationTextBoxes[i].Text = string.Empty;
             TranslationTextBoxes[i].Visible = false;
             --translation_text_boxes_visible;

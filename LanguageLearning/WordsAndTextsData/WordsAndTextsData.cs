@@ -23,7 +23,7 @@ public partial class WordsAndTextsData
     {
         if (str == null || str == string.Empty) throw new KeyNotFoundException();
         int sum = 0;
-        for (int i = 0; i < str.Length; ++i) sum += str[i];
+        for (int i = 0; i < str.Length; ++i) sum += char.ToLower(str[i]);
         return type == WordOrText.Word ? sum % Words.Length : sum % Texts.Length;
     }
 

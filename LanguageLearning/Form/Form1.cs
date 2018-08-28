@@ -10,6 +10,7 @@ public partial class Form1 : Form
     private FormStruct training_form, add_word_form, add_text_form, dictionary_edit_form;
     public WordsAndTextsData Data { get; private set; }
     public LinkedList<IncomprehensiblePair> Incomprehensible { get; private set; }
+    public DictionaryChanges DictionaryChangesObserver { get; private set; }
 
     public Form1()
     {
@@ -18,10 +19,15 @@ public partial class Form1 : Form
 
     private void Form1_Load(object sender, EventArgs e)
     {
+        DictionaryChangesObserver = new DictionaryChanges();
         training_form = new TrainingForm(this, TrainingButton, AddIncomprehensible);
         add_word_form = new AddWordsOrTextForms(this, AddWordsButton, CreateData, AddWordsOrTextForms.AddWordsOrTextFormsType.AddWordForm);
         add_text_form = new AddWordsOrTextForms(this, AddTextsButton, CreateData, AddWordsOrTextForms.AddWordsOrTextFormsType.AddTextForm);
         dictionary_edit_form = new DictionaryEditForm(this, DictionaryEditButton);
+
+        DictionaryChangesObserver.Add_AddWordsOrTextForms(add_word_form as AddWordsOrTextForms)
+            .Add_AddWordsOrTextForms(add_text_form as AddWordsOrTextForms)
+            .Add_DictionaryEditForm(dictionary_edit_form as DictionaryEditForm);
 
         training_form.BackToMainFormEvent += SetVisibleMainFormElements;
         add_word_form.BackToMainFormEvent += SetVisibleMainFormElements;

@@ -12,7 +12,7 @@ public partial class WordsAndTextsData
                 if (Words[index] == null) return null;
                 foreach (var pair in Words[index])
                 {
-                    if (pair.Key == word_or_text) return pair.Value;
+                    if (pair.Key.Equals(word_or_text, System.StringComparison.CurrentCultureIgnoreCase)) return pair.Value;
                 }
             }
             else
@@ -20,7 +20,7 @@ public partial class WordsAndTextsData
                 if (Texts[index] == null) return null;
                 foreach (var pair in Texts[index])
                 {
-                    if (pair.Key == word_or_text) return pair.Value;
+                    if (pair.Key.Equals(word_or_text, System.StringComparison.CurrentCultureIgnoreCase)) return pair.Value;
                 }
             }
         }
@@ -36,7 +36,7 @@ public partial class WordsAndTextsData
                 if (Words[index] == null) return null;
                 foreach (var pair in Words[index])
                 {
-                    if (pair.Key == word_or_text) return pair.Value;
+                    if (pair.Key.Equals(word_or_text, System.StringComparison.CurrentCultureIgnoreCase)) return pair.Value;
                 }
             }
             else
@@ -44,7 +44,7 @@ public partial class WordsAndTextsData
                 if (Texts[index] == null) return null;
                 foreach (var pair in Texts[index])
                 {
-                    if (pair.Key == word_or_text) return pair.Value;
+                    if (pair.Key.Equals(word_or_text, System.StringComparison.CurrentCultureIgnoreCase)) return pair.Value;
                 }
             }
         }

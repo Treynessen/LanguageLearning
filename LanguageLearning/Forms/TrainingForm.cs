@@ -18,17 +18,18 @@ public sealed class TrainingForm : FormStruct
 
     private WordsAndTextsData.WordOrText type;
     private Language language; // Язык слова или предложения в WordOrTextTextBox
-    private string right = "Правильно!";
-    private string wrong = "Неправильно!";
-    private string if_russian_word_or_text = null;  // Если вопрос на русском, то сюда записывается английский перевод. 
-                                                    // Если дан неправильный ответ, то слово из этого поля записывается в 
-                                                    // массив Incomprehensible
 
-    private string word_label = "Слово";
-    private string text_label = "Предложение";
+    private static string right = "Правильно!";
+    private static string wrong = "Неправильно!";
 
+    private string word_or_text_if_use_russian = null;  // Если вопрос на русском, то сюда записывается английский перевод. 
+                                                        // Если дан неправильный ответ, то слово из этого поля записывается в 
+                                                        // массив Incomprehensible
     private int[] words_fill_cells;
     private int[] texts_fill_cells;
+    private bool was_changes_in_words = true;
+    private bool was_changes_in_texts = true;
+
     int words_was_max_count = 0;
     int texts_was_max_count = 0;
     LinkedList<string> words_was;
@@ -68,7 +69,7 @@ public sealed class TrainingForm : FormStruct
         form.Controls.Add(WordOrTextTextBox);
 
         TranslationLabel = new Label();
-        TranslationLabel.Text = "Перевод";
+        TranslationLabel.Text = translation_label;
         TranslationLabel.Font = text_font;
         TranslationLabel.Location = new Point(161, 284);
         TranslationLabel.Visible = false;
@@ -95,16 +96,16 @@ public sealed class TrainingForm : FormStruct
                 KeyValuePair<string, LinkedListWithTranslations> pair = new KeyValuePair<string, LinkedListWithTranslations>();
                 string word_or_text = null;
                 if (type == WordsAndTextsData.WordOrText.Word)
-                    word_or_text = language == Language.English ? WordOrTextTextBox.Text : TranslationTextBox.Text.ToLower();
+                    word_or_text = language == Language.English ? WordOrTextTextBox.Text : TranslationTextBox.Text;
                 else
-                    word_or_text = language == Language.English ? WordOrTextTextBox.Text : TranslationTextBox.Text.ToLower();
+                    word_or_text = language == Language.English ? WordOrTextTextBox.Text : TranslationTextBox.Text;
                 int index = form.Data.GetHash(word_or_text, type);
                 // Получение пары слово - переводы
                 if (type == WordsAndTextsData.WordOrText.Word && form.Data.Words[index] != null)
                 {
                     foreach (var _pair in form.Data.Words[index])
                     {
-                        if (_pair.Key == word_or_text)
+                        if (_pair.Key.Equals(word_or_text, StringComparison.CurrentCultureIgnoreCase))
                         {
                             pair = _pair;
                             break;
@@ -115,7 +116,7 @@ public sealed class TrainingForm : FormStruct
                 {
                     foreach (var _pair in form.Data.Texts[index])
                     {
-                        if (_pair.Key == word_or_text)
+                        if (_pair.Key.Equals(word_or_text, StringComparison.CurrentCultureIgnoreCase))
                         {
                             pair = _pair;
                             break;
@@ -126,11 +127,11 @@ public sealed class TrainingForm : FormStruct
                 if (pair.Key != null && pair.Key != string.Empty)
                 {
 
-                    word_or_text = language == Language.English ? TranslationTextBox.Text.ToLower() : WordOrTextTextBox.Text;
+                    word_or_text = language == Language.English ? TranslationTextBox.Text : WordOrTextTextBox.Text;
                     ResultLabel.Text = wrong;
                     foreach (var str in pair.Value)
                     {
-                        if (str == word_or_text)
+                        if (str.Equals(word_or_text, StringComparison.CurrentCultureIgnoreCase))
                         {
                             ResultLabel.Text = right;
                             break;
@@ -143,18 +144,18 @@ public sealed class TrainingForm : FormStruct
                 if (ResultLabel.Text == wrong)
                 {
                     bool have = false;
-                    if (form.Incomprehensible != null)
+                    if (form.Incomprehensible != null && form.Incomprehensible.Count > 0)
                     {
                         foreach (var _pair in form.Incomprehensible)
                         {
-                            if ((language == Language.English ? WordOrTextTextBox.Text : if_russian_word_or_text) == _pair.Key)
+                            if ((language == Language.English ? WordOrTextTextBox.Text : word_or_text_if_use_russian) == _pair.Key)
                             {
                                 have = true;
                                 break;
                             }
                         }
                     }
-                    if (!have || form.Incomprehensible == null) add_incomprehensible(new IncomprehensiblePair(language == Language.English ? WordOrTextTextBox.Text : if_russian_word_or_text, type));
+                    if (!have || form.Incomprehensible == null && form.Incomprehensible.Count < 1) add_incomprehensible(new IncomprehensiblePair(language == Language.English ? WordOrTextTextBox.Text : word_or_text_if_use_russian, type));
                 }
                 // Если дан правильный ответ, то удаляем слово из списка
                 else
@@ -164,7 +165,7 @@ public sealed class TrainingForm : FormStruct
                         foreach (var _pair in form.Incomprehensible)
                         {
                             if ((language == Language.English && _pair.Key == WordOrTextTextBox.Text)
-                            || (language == Language.Russian && _pair.Key == if_russian_word_or_text))
+                            || (language == Language.Russian && _pair.Key == word_or_text_if_use_russian))
                             {
                                 form.Incomprehensible.Remove(_pair);
                                 break;
@@ -195,14 +196,13 @@ public sealed class TrainingForm : FormStruct
         NextWordOrTextButton.Click += (sender, e) =>
         {
             if (words_fill_cells.Length == 0 && texts_fill_cells.Length == 0) return;
-
-            if_russian_word_or_text = null;
+            Random rand = new Random();
+            word_or_text_if_use_russian = null;
 
             ResultLabel.Text = string.Empty;
             TranslationTextBox.Text = string.Empty;
             CheckButton.Enabled = true;
 
-            Random rand = new Random();
             if (words_fill_cells.Length != 0 || texts_fill_cells.Length != 0 || form.Incomprehensible != null)
             {
                 int rand_num = -1;
@@ -211,158 +211,115 @@ public sealed class TrainingForm : FormStruct
                 else if (form.Incomprehensible != null && form.Incomprehensible.Count > 0) rand_num = 2;
                 else if (words_fill_cells.Length != 0) rand_num = 0;
                 else if (texts_fill_cells.Length != 0) rand_num = 1;
-                // Выбор слова
-                if (rand_num == 0)
+                // Выбор слова или предложения
+                if (rand_num < 2)
                 {
-                    WordOrTextLabel.Text = word_label;
-                    type = WordsAndTextsData.WordOrText.Word;
-                    int index = -1;
-                    do
+                    LinkedList<KeyValuePair<string, LinkedListWithTranslations>> pair_list = null;
+                    if (rand_num == 0)
                     {
-                        index = rand.Next(0, words_fill_cells.Length);
-                        index = words_fill_cells[index];
-                    } while (form.Data.Words[index] == null || form.Data.Words[index].Count == 0);
+                        WordOrTextLabel.Text = word_label;
+                        type = WordsAndTextsData.WordOrText.Word;
+                        pair_list = form.Data.Words[words_fill_cells[rand.Next(0, words_fill_cells.Length)]];
+                    }
+                    else
+                    {
+                        WordOrTextLabel.Text = text_label;
+                        type = WordsAndTextsData.WordOrText.Text;
+                        pair_list = form.Data.Texts[texts_fill_cells[rand.Next(0, texts_fill_cells.Length)]];
+                    }
+                    KeyValuePair<string, LinkedListWithTranslations> pair = pair_list.ElementAt(rand.Next(0, pair_list.Count));
 
-                    int list_index = rand.Next(0, form.Data.Words[index].Count);
-                    // Проверка, было ли это слово ранее
-                    if (words_was.Count > 0)
+                    // Проверка было ли это слово/предложение ранее
+                    if ((rand_num == 0 ? words_was.Count : texts_was.Count) > 0)
                     {
-                        foreach (var str in words_was)
+                        foreach (var str in rand_num == 0 ? words_was : texts_was)
                         {
-                            if (form.Data.Words[index].ElementAt(list_index).Key == str)
+                            if (pair.Key.Equals(str, StringComparison.CurrentCultureIgnoreCase))
                             {
                                 NextWordOrTextButton.PerformClick();
                                 return;
                             }
                         }
                     }
-                    // Устанавливает в текст бокс английское слово
+
+                    // Устанавливаем в WordOrTextTextBox английское слово/предложение
                     if (rand.Next(0, 2) == 0)
                     {
                         language = Language.English;
-                        WordOrTextTextBox.Text = form.Data.Words[index].ElementAt(list_index).Key;
+                        WordOrTextTextBox.Text = pair.Key;
                     }
-                    // Устанавливает в текст бокс перевод
+                    // Устанавливаем в WordOrTextTextBox русское слово/предложение
                     else
                     {
                         language = Language.Russian;
-                        int translation_index = rand.Next(0, form.Data.Words[index].ElementAt(list_index).Value.Count);
-                        WordOrTextTextBox.Text = form.Data.Words[index].ElementAt(list_index).Value.ElementAt(translation_index);
-                        if_russian_word_or_text = form.Data.Words[index].ElementAt(list_index).Key;
-                    }
-
-                    if (words_was_max_count > 0)
-                    {
-                        // Если не заполнен, то продолжаем заполнение
-                        if (words_was.Count < words_was_max_count) words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
-                        // Иначе удаляем первое значение из очереди и добавляем слово в конец списка
-                        else
-                        {
-                            words_was.RemoveFirst();
-                            words_was.AddLast(form.Data.Words[index].ElementAt(list_index).Key);
-                        }
-                    }
-                }
-                // Выбор предложения
-                else if (rand_num == 1)
-                {
-                    WordOrTextLabel.Text = text_label;
-                    type = WordsAndTextsData.WordOrText.Text;
-                    int index = -1;
-                    do
-                    {
-                        index = rand.Next(0, texts_fill_cells.Length);
-                        index = texts_fill_cells[index];
-                    } while (form.Data.Texts[index] == null || form.Data.Texts[index].Count == 0);
-
-                    int list_index = rand.Next(0, form.Data.Texts[index].Count);
-                    // Проверка, был ли этот текст ранее
-                    if (texts_was.Count > 0)
-                    {
-                        foreach (var str in texts_was)
-                        {
-                            if (form.Data.Texts[index].ElementAt(list_index).Key == str)
-                            {
-                                NextWordOrTextButton.PerformClick();
-                                return;
-                            }
-                        }
-                    }
-                    // Устанавливает в текст бокс английский текст
-                    if (rand.Next(0, 2) == 0)
-                    {
-                        language = Language.English;
-                        WordOrTextTextBox.Text = form.Data.Texts[index].ElementAt(list_index).Key;
-                    }
-                    // Устанавливает в текст бокс перевод
-                    else
-                    {
-                        language = Language.Russian;
-                        int translation_index = rand.Next(0, form.Data.Texts[index].ElementAt(list_index).Value.Count);
-                        WordOrTextTextBox.Text = form.Data.Texts[index].ElementAt(list_index).Value.ElementAt(translation_index);
-                        if_russian_word_or_text = form.Data.Texts[index].ElementAt(list_index).Key;
-                    }
-
-                    if (texts_was_max_count > 0)
-                    {
-                        // Если не заполнен, то продолжаем заполнение
-                        if (texts_was.Count < texts_was_max_count) texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
-                        // Иначе удаляем первое значение из очереди и добавляем текст в конец списка
-                        else
-                        {
-                            texts_was.RemoveFirst();
-                            texts_was.AddLast(form.Data.Texts[index].ElementAt(list_index).Key);
-                        }
-                    }
-                }
-                // Выбор из списка плохо усвоенных слов или предложений
-                else if (rand_num > 1)
-                {
-                    // Устанавливаем в текст бокс английское слово или английский текст
-                    if (rand.Next(0, 2) == 0)
-                    {
-                        WordOrTextTextBox.Text = form.Incomprehensible.First.Value.Key;
-                        type = form.Incomprehensible.First.Value.Value;
-                        language = Language.English;
-                    }
-                    // Устанавливаем в текст бокс русское слово или русский текст
-                    else
-                    {
-                        if_russian_word_or_text = form.Incomprehensible.First.Value.Key;
-                        type = form.Incomprehensible.First.Value.Value;
-                        language = Language.Russian;
-                        int index = form.Data.GetHash(if_russian_word_or_text, type);
-                        KeyValuePair<string, LinkedListWithTranslations> pair = new KeyValuePair<string, LinkedListWithTranslations>();
-                        if (type == WordsAndTextsData.WordOrText.Word)
-                        {
-                            WordOrTextLabel.Text = word_label;
-                            foreach (var _pair in form.Data.Words[index])
-                            {
-                                if (if_russian_word_or_text == _pair.Key)
-                                {
-                                    pair = _pair;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            WordOrTextLabel.Text = text_label;
-                            foreach (var _pair in form.Data.Texts[index])
-                            {
-                                if (if_russian_word_or_text == _pair.Key)
-                                {
-                                    pair = _pair;
-                                    break;
-                                }
-                            }
-                        }
+                        word_or_text_if_use_russian = pair.Key;
                         WordOrTextTextBox.Text = pair.Value.ElementAt(rand.Next(0, pair.Value.Count));
+                    }
+                    // Добавление слова/предложения в список исключений
+                    if ((rand_num == 0 ? words_was_max_count : texts_was_max_count) > 0)
+                    {
+                        if (rand_num == 0)
+                        {
+                            // Если не заполнен, то продолжаем заполнение
+                            if (words_was.Count < words_was_max_count)
+                                words_was.AddLast(pair.Key);
+                            // Иначе удаляем первое значение из очереди и добавляем слово в конец списка
+                            else
+                            {
+                                words_was.RemoveFirst();
+                                words_was.AddLast(pair.Key);
+                            }
+                        }
+                        else
+                        {
+                            // Если не заполнен, то продолжаем заполнение
+                            if (texts_was.Count < texts_was_max_count)
+                                texts_was.AddLast(pair.Key);
+                            // Иначе удаляем первое значение из очереди и добавляем слово в конец списка
+                            else
+                            {
+                                texts_was.RemoveFirst();
+                                texts_was.AddLast(pair.Key);
+                            }
+                        }
+                    }
+                }
+
+                // Выбор из списка плохо усвоенных слов или предложений
+                else
+                {
+                    type = form.Incomprehensible.First.Value.Value;
+                    WordOrTextLabel.Text = type == WordsAndTextsData.WordOrText.Word ? word_label : text_label;
+                    // Устанавливаем в WordOrTextTextBox английское слово/предложение
+                    if (rand.Next(0, 2) == 0)
+                    {
+                        language = Language.English;
+                        WordOrTextTextBox.Text = form.Incomprehensible.First.Value.Key;
+                    }
+                    // Устанавливаем в WordOrTextTextBox русское слово/предложение
+                    else
+                    {
+                        language = Language.Russian;
+                        word_or_text_if_use_russian = form.Incomprehensible.First.Value.Key;
+                        LinkedListWithTranslations translations_list = form.Data.GetWordOrTextTranslation(word_or_text_if_use_russian, form.Incomprehensible.First.Value.Value);
+                        WordOrTextTextBox.Text = translations_list.ElementAt(rand.Next(0, translations_list.Count));
                     }
                 }
             }
         };
         form.Controls.Add(NextWordOrTextButton);
+
+        form.DictionaryChangesObserver.WordOrTextAddedEvent += (sender, e) =>
+        {
+            if (e.Type == TypeChanges.WordAdded) was_changes_in_words = true;
+            if (e.Type == TypeChanges.TextAdded) was_changes_in_texts = true;
+        };
+
+        form.DictionaryChangesObserver.WordOrTextDeletedEvent += (sender, e) =>
+        {
+            if (e.Type == TypeChanges.WordDeleted) was_changes_in_words = true;
+            if (e.Type == TypeChanges.TextDeleted) was_changes_in_texts = true;
+        };
     }
 
     private void SetVisibleFormElements()
@@ -401,35 +358,46 @@ public sealed class TrainingForm : FormStruct
     {
         // Нужно переделать реализацию! Возможно можно как-то связать остальные формы, чтобы они уведомляли эту форму,
         // когда происходит добавление или удаление элемента из словаря.
-        LinkedList<int> words_fill_cells_nums = new LinkedList<int>();
-        LinkedList<int> texts_fill_cells_nums = new LinkedList<int>();
+        LinkedList<int> words_fill_cells_nums = null;
+        if (was_changes_in_words) words_fill_cells_nums = new LinkedList<int>();
+        LinkedList<int> texts_fill_cells_nums = null;
+        if (was_changes_in_texts) texts_fill_cells_nums = new LinkedList<int>();
+
         for (int i = 0; i < (form.Data.Words.Length > form.Data.Texts.Length ? form.Data.Words.Length : form.Data.Texts.Length); ++i)
         {
-            if (i < form.Data.Words.Length && form.Data.Words[i] != null && form.Data.Words[i].Count > 0) words_fill_cells_nums.AddLast(i);
-            if (i < form.Data.Texts.Length && form.Data.Texts[i] != null && form.Data.Texts[i].Count > 0) texts_fill_cells_nums.AddLast(i);
+            if (was_changes_in_words && i < form.Data.Words.Length && form.Data.Words[i] != null && form.Data.Words[i].Count > 0) words_fill_cells_nums.AddLast(i);
+            if (was_changes_in_texts && i < form.Data.Texts.Length && form.Data.Texts[i] != null && form.Data.Texts[i].Count > 0) texts_fill_cells_nums.AddLast(i);
         }
-        words_fill_cells = new int[words_fill_cells_nums.Count];
-        texts_fill_cells = new int[texts_fill_cells_nums.Count];
-        if (words_fill_cells_nums.Count == 0 && texts_fill_cells_nums.Count == 0) return;
+        if (was_changes_in_words) words_fill_cells = new int[words_fill_cells_nums.Count];
+        if (was_changes_in_texts) texts_fill_cells = new int[texts_fill_cells_nums.Count];
+        if ((words_fill_cells_nums == null || words_fill_cells_nums.Count == 0)
+            && (texts_fill_cells_nums == null || texts_fill_cells_nums.Count == 0)) return;
         // Заполнение массивов номерами не пустых ячеек
         {
             // wn - words_node
             // tn - texts_node
             // w - переменная для итерирования по массиву с адресами ячеек со словами
             // t - переменная для итерирования по массиву с адресами ячеек с текстом
-            LinkedListNode<int> wn = words_fill_cells_nums.First, tn = texts_fill_cells_nums.First;
-            for (int w = 0, t = 0; (words_fill_cells_nums.Count > texts_fill_cells_nums.Count ? wn : tn) != null;
-                 wn = wn != null ? wn.Next : null, tn = tn != null ? tn.Next : null)
+            LinkedListNode<int> wn = was_changes_in_words ? words_fill_cells_nums.First : null;
+            LinkedListNode<int> tn = was_changes_in_texts ? texts_fill_cells_nums.First : null;
+            for (int w = 0, t = 0; wn != null || tn != null; wn = wn != null ? wn.Next : null, tn = tn != null ? tn.Next : null)
             {
                 if (wn != null) words_fill_cells[w++] = wn.Value;
                 if (tn != null) texts_fill_cells[t++] = tn.Value;
             }
         }
-        words_was_max_count = words_fill_cells_nums.Count / 2;
-        texts_was_max_count = texts_fill_cells_nums.Count / 2;
-        words_was = new LinkedList<string>();
-        texts_was = new LinkedList<string>();
-
+        if (was_changes_in_words)
+        {
+            words_was_max_count = words_fill_cells_nums.Count / 2;
+            words_was = new LinkedList<string>();
+        }
+        if (was_changes_in_texts)
+        {
+            texts_was_max_count = texts_fill_cells_nums.Count / 2;
+            texts_was = new LinkedList<string>();
+        }
+        was_changes_in_words = false;
+        was_changes_in_texts = false;
     }
 
     private enum Language

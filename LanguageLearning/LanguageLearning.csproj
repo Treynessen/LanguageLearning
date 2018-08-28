@@ -56,6 +56,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Form\Program.cs" />
+    <Compile Include="Observable\DictionaryChanges.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialize\Container.cs" />
     <Compile Include="Serialize\Serialize.cs" />
