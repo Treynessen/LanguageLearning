@@ -57,7 +57,7 @@ public sealed class DictionaryEditForm : FormStruct
         form.Controls.Add(WordsOrTextsLabel);
 
         WordsCheckBox = new CheckBox();
-        WordsCheckBox.Text = word_label;
+        WordsCheckBox.Text = words_label;
         WordsCheckBox.Font = new Font("Consolas", 12, FontStyle.Regular);
         WordsCheckBox.Location = new Point(515, 132);
         WordsCheckBox.Checked = false;
@@ -90,7 +90,7 @@ public sealed class DictionaryEditForm : FormStruct
         form.Controls.Add(WordsCheckBox);
 
         TextsCheckBox = new CheckBox();
-        TextsCheckBox.Text = text_label;
+        TextsCheckBox.Text = texts_label;
         TextsCheckBox.Font = new Font("Consolas", 12, FontStyle.Regular);
         TextsCheckBox.Location = new Point(598, 132);
         TextsCheckBox.Checked = false;
