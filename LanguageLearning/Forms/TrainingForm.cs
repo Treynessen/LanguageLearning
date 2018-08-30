@@ -80,7 +80,7 @@ public sealed class TrainingForm : FormStruct
         TranslationTextBox.Width = 550;
         TranslationTextBox.Location = new Point(167, 314);
         TranslationTextBox.Visible = false;
-        TranslationTextBox.KeyDown += (sender, e) =>
+        TranslationTextBox.KeyUp += (sender, e) =>
         {
             if (CheckButton.Enabled || NextWordOrTextButton.Enabled)
             {
