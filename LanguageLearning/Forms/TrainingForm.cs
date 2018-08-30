@@ -80,6 +80,14 @@ public sealed class TrainingForm : FormStruct
         TranslationTextBox.Width = 550;
         TranslationTextBox.Location = new Point(167, 314);
         TranslationTextBox.Visible = false;
+        TranslationTextBox.KeyDown += (sender, e) =>
+        {
+            if (CheckButton.Enabled || NextWordOrTextButton.Enabled)
+            {
+                if (CheckButton.Enabled && e.KeyCode == Keys.Enter) CheckButton.PerformClick();
+                else if (NextWordOrTextButton.Enabled && e.KeyCode == Keys.Enter) NextWordOrTextButton.PerformClick();
+            }
+        };
         form.Controls.Add(TranslationTextBox);
 
         CheckButton = new Button();
