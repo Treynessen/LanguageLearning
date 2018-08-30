@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 
@@ -9,7 +10,15 @@ public static class Serialize
         if (file_stream != null && data != null)
         {
             BinaryFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(file_stream, data);
+            try
+            {
+                formatter.Serialize(file_stream, data);
+            }
+            catch (SerializationException)
+            {
+                MessageBox.Show("Ошибка записи данных в файл", "Ошибка");
+                throw;
+            }
         }
     }
 

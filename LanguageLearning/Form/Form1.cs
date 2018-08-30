@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using IncomprehensiblePair = System.Collections.Generic.KeyValuePair<string, WordsAndTextsData.WordOrText>;
 
 public partial class Form1 : Form
@@ -86,10 +87,24 @@ public partial class Form1 : Form
     {
         if (Data != null)
         {
-            if (data_file == null) File.Create("words.data").Close();
-            else data_file.Close();
-            using (data_file = new FileStream("words.data", FileMode.Truncate))
+            if (data_file == null) File.Create("words.data");
+            data_file.Seek(0, SeekOrigin.Begin);
+            byte[] buffer = new byte[data_file.Length];
+            data_file.Read(buffer, 0, buffer.Length);
+            data_file.SetLength(0);
+            try
+            {
                 Serialize.SerializeToFile(data_file, new Container(Data.Words, Data.Texts, Incomprehensible));
+            }
+            catch (SerializationException)
+            {
+                data_file.SetLength(0);
+                data_file.Write(buffer, 0, buffer.Length);
+            }
+            finally
+            {
+                data_file.Close();
+            }
         }
     }
 
