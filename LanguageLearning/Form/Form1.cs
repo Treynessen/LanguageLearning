@@ -51,7 +51,7 @@ public partial class Form1 : Form
         {
             DictionaryEditButton.Enabled = false;
             TrainingButton.Enabled = false;
-            MessageBox.Show("Открыт пустой файл", "Ошибка");
+            MessageBox.Show("Файл со словарем не содержит данных", "Ошибка");
             return;
         }
 
@@ -112,7 +112,6 @@ public partial class Form1 : Form
             {
                 data_file.SetLength(0);
                 if (buffer != null) data_file.Write(buffer, 0, buffer.Length);
-                else data_file.SetLength(0);
             }
             finally
             {
