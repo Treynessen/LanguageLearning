@@ -121,6 +121,7 @@ public sealed class AddWordsOrTextForms : FormStruct
 
                 if (count_text_boxes_with_text > 0)
                 {
+                    WordOrTextTextBox.Text = WordOrTextTextBox.Text.Replace('’', '\'');
                     if (form.Data == null) create_data();
                     if (translation_text_boxes_visible == 1)
                         was_added_new_word_or_text = form.Data.AddWordOrText(type, WordOrTextTextBox.Text, TranslationTextBoxes[0].Text);
